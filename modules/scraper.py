@@ -6,6 +6,8 @@
 import streamlit as st
 import requests
 import feedparser
+
+from modules.config import get_secret
 import re
 import os
 from datetime import datetime
@@ -42,8 +44,8 @@ UA = {"User-Agent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 RAGFinan
 
 
 def _sb():
-    url = st.secrets.get("SUPABASE_URL", os.environ.get("SUPABASE_URL", ""))
-    key = st.secrets.get("SUPABASE_KEY", os.environ.get("SUPABASE_KEY", ""))
+    url = get_secret("SUPABASE_URL")
+    key = get_secret("SUPABASE_KEY")
     hdr = {"apikey": key, "Authorization": f"Bearer {key}",
            "Content-Type": "application/json"}
     return f"{url}/rest/v1/rag_documents", hdr
