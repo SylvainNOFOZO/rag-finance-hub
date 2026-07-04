@@ -4,6 +4,8 @@
 # ══════════════════════════════════════════════════════════════════════════════
 import streamlit as st
 import os
+
+from modules.config import get_secret
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
 
@@ -31,7 +33,7 @@ STOPWORDS_FR_EN = [
 @st.cache_resource(show_spinner=False)
 def _get_anthropic_client():
     import anthropic
-    api_key = st.secrets.get("ANTHROPIC_API_KEY", os.environ.get("ANTHROPIC_API_KEY", ""))
+    api_key = get_secret("ANTHROPIC_API_KEY")
     return anthropic.Anthropic(api_key=api_key) if api_key else None
 
 
