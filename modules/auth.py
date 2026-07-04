@@ -9,10 +9,12 @@ import hashlib
 import os
 import secrets as pysecrets
 
+from modules.config import get_secret
+
 
 def _sb():
-    url = st.secrets.get("SUPABASE_URL", os.environ.get("SUPABASE_URL", ""))
-    key = st.secrets.get("SUPABASE_KEY", os.environ.get("SUPABASE_KEY", ""))
+    url = get_secret("SUPABASE_URL")
+    key = get_secret("SUPABASE_KEY")
     hdr = {
         "apikey": key,
         "Authorization": f"Bearer {key}",
@@ -48,8 +50,8 @@ def bootstrap_admin():
     try:
         r = requests.get(f"{ep}?select=username&limit=1", headers=hdr, timeout=8)
         if r.status_code == 200 and r.json() == []:
-            admin_user = st.secrets.get("ADMIN_USERNAME", os.environ.get("ADMIN_USERNAME", "admin"))
-            admin_pass = st.secrets.get("ADMIN_PASSWORD", os.environ.get("ADMIN_PASSWORD", ""))
+            admin_user = get_secret("ADMIN_USERNAME", "admin")
+            admin_pass = get_secret("ADMIN_PASSWORD")
             if admin_pass:
                 requests.post(ep, headers={**hdr, "Prefer": "resolution=merge-duplicates"},
                     json={"username": admin_user,
