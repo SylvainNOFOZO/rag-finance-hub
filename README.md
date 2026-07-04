@@ -3,9 +3,8 @@ title: RAG Finance Hub
 emoji: 📊
 colorFrom: green
 colorTo: indigo
-sdk: streamlit
-sdk_version: "1.39.0"
-app_file: app.py
+sdk: docker
+app_port: 8501
 pinned: false
 ---
 
