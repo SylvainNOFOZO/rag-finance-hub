@@ -30,24 +30,7 @@ st.set_page_config(
     initial_sidebar_state="expanded",
 )
 
-# ── CSS global ────────────────────────────────────────────────────────────────
-st.markdown("""
-<style>
-@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&display=swap');
-.stApp { background-color: #0a0c12; }
-section[data-testid="stSidebar"] > div { background-color:#0c0f1a; border-right:1px solid #1e2535; }
-h1,h2,h3,h4,h5,h6,p,label,.stMarkdown { color:#e8ecf4 !important; }
-.stSelectbox label,.stTextInput label,.stMultiSelect label,.stSlider label {
-    color:#8892a4 !important; font-size:11px !important;
-    text-transform:uppercase; letter-spacing:1px; }
-.stButton > button[kind="primary"] { background-color:#00d4aa; color:#000;
-    font-weight:800; border:none; border-radius:10px; }
-.stButton > button { border-radius:10px; font-weight:700; }
-hr { border-color:#1e2535 !important; }
-div[data-testid="stChatMessage"] { background:#111520; border:1px solid #1e2535;
-    border-radius:12px; }
-</style>
-""", unsafe_allow_html=True)
+# CSS injecté dynamiquement plus bas (dépend du thème choisi par l'utilisateur)
 
 
 # ══════════════════════════════════════════════════════════════════════════════
@@ -63,6 +46,81 @@ def get_secret(name: str, default: str = "") -> str:
         return st.secrets.get(name, default)
     except Exception:
         return default
+
+
+# ══════════════════════════════════════════════════════════════════════════════
+# THÈMES
+# ══════════════════════════════════════════════════════════════════════════════
+THEMES = {
+    "Émeraude Sombre": {
+        "bg":"#0a0c12","bg2":"#0d111d","card":"#111520","border":"#1e2535",
+        "text":"#e8ecf4","muted":"#6b7894","accent":"#00d4aa","win":"#00d4aa",
+        "loss":"#ff4d6d","alt":"#7c6aff","orange":"#ff9f43","sidebar":"#0c0f1a",
+        "btn_text":"#000000",
+    },
+    "Indigo Minuit": {
+        "bg":"#0a0a16","bg2":"#0d0d1a","card":"#13131f","border":"#232336",
+        "text":"#eaeaf5","muted":"#7a7a9a","accent":"#6c5ce7","win":"#2ecc91",
+        "loss":"#ff5c7a","alt":"#00cec9","orange":"#fdcb6e","sidebar":"#0e0e1c",
+        "btn_text":"#ffffff",
+    },
+    "Ardoise Bleu": {
+        "bg":"#0b0e14","bg2":"#0e1118","card":"#141821","border":"#232a38",
+        "text":"#e5e9f0","muted":"#6f7a8c","accent":"#4fa3ff","win":"#2dd4bf",
+        "loss":"#fb7185","alt":"#a78bfa","orange":"#ffb454","sidebar":"#0d1016",
+        "btn_text":"#0b0e14",
+    },
+    "Ambre Doré": {
+        "bg":"#100d0a","bg2":"#14110d","card":"#1c1812","border":"#2e2620",
+        "text":"#f5ece0","muted":"#9c8f7c","accent":"#f0a500","win":"#9ed36c",
+        "loss":"#ff6b5e","alt":"#ff7849","orange":"#ffcb47","sidebar":"#120f0b",
+        "btn_text":"#1c1410",
+    },
+    "Ivoire Clair": {
+        "bg":"#f4f5f9","bg2":"#eceef4","card":"#ffffff","border":"#e1e4ec",
+        "text":"#1a1d29","muted":"#6b7280","accent":"#00a884","win":"#00a884",
+        "loss":"#e74c3c","alt":"#6c5ce7","orange":"#e67e22","sidebar":"#ffffff",
+        "btn_text":"#ffffff",
+    },
+}
+THEME_NAMES = list(THEMES.keys())
+
+
+def get_theme():
+    name = st.session_state.get("theme_name", THEME_NAMES[0])
+    return THEMES.get(name, THEMES[THEME_NAMES[0]])
+
+
+def build_css(t):
+    return f"""
+<style>
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&display=swap');
+@import url('https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css');
+.stApp {{ background-color: {t['bg']}; }}
+section[data-testid="stSidebar"] > div {{ background-color:{t['sidebar']}; border-right:1px solid {t['border']}; }}
+h1,h2,h3,h4,h5,h6,p,label,.stMarkdown {{ color:{t['text']} !important; }}
+.stSelectbox label,.stTextInput label,.stMultiSelect label,.stSlider label {{
+    color:{t['muted']} !important; font-size:11px !important;
+    text-transform:uppercase; letter-spacing:1px; }}
+div[data-baseweb="input"] input, div[data-baseweb="textarea"] textarea,
+div[data-baseweb="select"] > div {{
+    background-color:{t['bg2']} !important; border-color:{t['border']} !important; color:{t['text']} !important; }}
+.stButton > button[kind="primary"] {{ background-color:{t['accent']}; color:{t['btn_text']};
+    font-weight:800; border:none; border-radius:10px; }}
+.stButton > button {{ border-radius:10px; font-weight:700; }}
+.stButton > button:hover {{ filter:brightness(0.92); }}
+hr {{ border-color:{t['border']} !important; }}
+div[data-testid="stChatMessage"] {{ background:{t['card']}; border:1px solid {t['border']};
+    border-radius:12px; }}
+.rfh-card {{ background:{t['card']}; border:1px solid {t['border']}; border-radius:14px;
+    padding:16px 20px; }}
+.rfh-kpi {{ background:{t['card']}; border:1px solid {t['border']}; border-radius:14px;
+    padding:16px 18px; min-height:100px; position:relative; overflow:hidden; }}
+.rfh-kpi-bar {{ position:absolute; top:0; left:0; right:0; height:3px; }}
+.rfh-badge {{ padding:2px 10px; border-radius:20px; font-size:11px; font-weight:700;
+    letter-spacing:.5px; display:inline-block; }}
+</style>
+"""
 
 
 # ══════════════════════════════════════════════════════════════════════════════
@@ -364,27 +422,54 @@ def admin_panel():
 # ══════════════════════════════════════════════════════════════════════════════
 FEEDS = {
     "Finance": [
-        ("Yahoo Finance",   "https://finance.yahoo.com/news/rssindex"),
-        ("Les Échos Marchés", "https://services.lesechos.fr/rss/les-echos-finance-marches.xml"),
-        ("Investing FR",    "https://fr.investing.com/rss/news.rss"),
-        ("CNBC Finance",    "https://search.cnbc.com/rs/search/combinedcms/view.xml?partnerId=wrss01&id=10000664"),
+        ("Yahoo Finance",      "https://finance.yahoo.com/news/rssindex"),
+        ("Les Échos Marchés",  "https://services.lesechos.fr/rss/les-echos-finance-marches.xml"),
+        ("Investing FR",       "https://fr.investing.com/rss/news.rss"),
+        ("CNBC Finance",       "https://search.cnbc.com/rs/search/combinedcms/view.xml?partnerId=wrss01&id=10000664"),
+        ("MarketWatch",        "https://feeds.content.dowjones.io/public/rss/mw_topstories"),
+        ("Seeking Alpha",      "https://seekingalpha.com/market_currents.xml"),
+        ("Boursorama",         "https://www.boursorama.com/rss/actualites/dernieres-infos.xml"),
+        ("Capital.fr",         "https://www.capital.fr/rss"),
     ],
     "Trading": [
-        ("FXStreet",   "https://www.fxstreet.com/rss/news"),
-        ("ForexLive",  "https://www.forexlive.com/feed/news"),
-        ("DailyForex", "https://www.dailyforex.com/rss/forexnews.xml"),
-        ("Investing Commodities", "https://fr.investing.com/rss/news_11.rss"),
+        ("FXStreet",           "https://www.fxstreet.com/rss/news"),
+        ("ForexLive",          "https://www.forexlive.com/feed/news"),
+        ("DailyForex",         "https://www.dailyforex.com/rss/forexnews.xml"),
+        ("Investing Commodities","https://fr.investing.com/rss/news_11.rss"),
+        ("Kitco News",         "https://www.kitco.com/rss/KitcoNews.xml"),
+        ("Investing Technical","https://fr.investing.com/rss/news_25.rss"),
     ],
     "Économie": [
-        ("Le Monde Économie", "https://www.lemonde.fr/economie/rss_full.xml"),
+        ("Le Monde Économie",  "https://www.lemonde.fr/economie/rss_full.xml"),
         ("Les Échos Économie", "https://services.lesechos.fr/rss/les-echos-economie.xml"),
-        ("VoxEU / CEPR",  "https://cepr.org/rss/voxeu"),
-        ("La Tribune",    "https://www.latribune.fr/feed.xml"),
+        ("VoxEU / CEPR",       "https://cepr.org/rss/voxeu"),
+        ("La Tribune",         "https://www.latribune.fr/feed.xml"),
+        ("Challenges Éco",     "https://www.challenges.fr/rss.xml"),
+        ("Federal Reserve",    "https://www.federalreserve.gov/feeds/press_all.xml"),
+        ("BCE — Communiqués",  "https://www.ecb.europa.eu/rss/press.xml"),
+        ("Bank of England",    "https://www.bankofengland.co.uk/rss/news"),
     ],
     "Économétrie": [
-        ("arXiv Econometrics",  "https://arxiv.org/rss/econ.EM"),
-        ("arXiv Stat Finance",  "https://arxiv.org/rss/q-fin.ST"),
-        ("arXiv Applied Stats", "https://arxiv.org/rss/stat.AP"),
+        ("arXiv Econometrics", "https://arxiv.org/rss/econ.EM"),
+        ("arXiv Stat Finance", "https://arxiv.org/rss/q-fin.ST"),
+        ("arXiv Applied Stats","https://arxiv.org/rss/stat.AP"),
+        ("arXiv Risk Mgmt",    "https://arxiv.org/rss/q-fin.RM"),
+        ("arXiv Portfolio Mgmt","https://arxiv.org/rss/q-fin.PM"),
+        ("arXiv General Finance","https://arxiv.org/rss/q-fin.GN"),
+    ],
+    "Crypto": [
+        ("CoinDesk",           "https://www.coindesk.com/arc/outboundfeeds/rss/"),
+        ("CoinTelegraph",      "https://cointelegraph.com/rss"),
+        ("Investing Crypto",   "https://fr.investing.com/rss/news_301.rss"),
+    ],
+    "Matières Premières": [
+        ("OilPrice.com",       "https://oilprice.com/rss/main"),
+        ("Kitco Commodities",  "https://www.kitco.com/rss/KitcoCommodities.xml"),
+        ("Investing Énergie",  "https://fr.investing.com/rss/news_11.rss"),
+    ],
+    "Géopolitique & Marchés": [
+        ("Le Monde International","https://www.lemonde.fr/international/rss_full.xml"),
+        ("Les Échos Monde",    "https://services.lesechos.fr/rss/les-echos-monde.xml"),
     ],
 }
 
@@ -511,12 +596,13 @@ def scraper_page():
     st.caption("Scraping des flux RSS spécialisés — les documents alimentent le "
                "chatbot RAG, les dashboards et les nuages de mots.")
 
+    _t = get_theme()
     n_docs = count_documents()
     st.markdown(
-        f"<div style='background:#111520;border:1px solid #1e2535;border-radius:12px;"
+        f"<div style='background:{_t['card']};border:1px solid {_t['border']};border-radius:12px;"
         f"padding:14px 20px;margin-bottom:16px'>"
-        f"<span style='color:#8892a4'>Documents en base :</span> "
-        f"<b style='color:#00d4aa;font-size:20px;font-family:monospace'>{n_docs}</b></div>",
+        f"<span style='color:{_t['muted']}'>Documents en base :</span> "
+        f"<b style='color:{_t['accent']};font-size:20px;font-family:monospace'>{n_docs}</b></div>",
         unsafe_allow_html=True)
 
     domains = st.multiselect(
@@ -580,14 +666,15 @@ def scraper_page():
                           "Économie": "#ff9f43", "Économétrie": "#54a0ff"}
             dc = dom_colors.get(doc.get("domain", ""), "#8892a4")
             pub = str(doc.get("published", ""))[:16].replace("T", " ")
+            _t2 = get_theme()
             st.markdown(
-                f"<div style='background:#111520;border:1px solid #1e2535;"
+                f"<div style='background:{_t2['card']};border:1px solid {_t2['border']};"
                 f"border-radius:10px;padding:10px 16px;margin-bottom:8px'>"
                 f"<span style='color:{dc};font-size:11px;font-weight:700;"
                 f"text-transform:uppercase'>{doc.get('domain','')}</span> "
-                f"<span style='color:#6b7894;font-size:11px'> · {doc.get('source','')} · {pub}</span><br>"
+                f"<span style='color:{_t2['muted']};font-size:11px'> · {doc.get('source','')} · {pub}</span><br>"
                 f"<a href='{doc.get('url','')}' target='_blank' "
-                f"style='color:#e8ecf4;text-decoration:none;font-weight:600'>"
+                f"style='color:{_t2['text']};text-decoration:none;font-weight:600'>"
                 f"{doc.get('title','')}</a></div>",
                 unsafe_allow_html=True)
 
@@ -717,8 +804,8 @@ def chatbot_page():
     with oc1:
         domains_filter = st.multiselect(
             "Domaines de recherche",
-            ["Finance", "Trading", "Économie", "Économétrie"],
-            default=["Finance", "Trading", "Économie", "Économétrie"],
+            list(FEEDS.keys()),
+            default=list(FEEDS.keys()),
             key="chat_domains")
     with oc2:
         model_label = st.selectbox("Modèle", list(MODELS.keys()), key="chat_model")
@@ -763,37 +850,57 @@ def chatbot_page():
 
 
 # ══════════════════════════════════════════════════════════════════════════════
-# DASHBOARD
+# DASHBOARD — Vue analytique professionnelle
 # ══════════════════════════════════════════════════════════════════════════════
-_BG, _GRID, _TEXT = "#111520", "#1e2535", "#8892a4"
-_COLORS = ["#00d4aa", "#7c6aff", "#ff9f43", "#54a0ff", "#ff4d6d",
-           "#00cec9", "#fdcb6e", "#5f27cd"]
-DOM_COLORS = {"Finance": "#00d4aa", "Trading": "#7c6aff",
-              "Économie": "#ff9f43", "Économétrie": "#54a0ff"}
+DOM_COLORS = {
+    "Finance": "#00d4aa", "Trading": "#7c6aff", "Économie": "#ff9f43",
+    "Économétrie": "#54a0ff", "Crypto": "#fdcb6e", "Matières Premières": "#ff4d6d",
+    "Géopolitique & Marchés": "#00cec9",
+}
+_PALETTE = ["#00d4aa","#7c6aff","#ff9f43","#54a0ff","#ff4d6d","#00cec9","#fdcb6e","#5f27cd","#fd79a8","#0984e3"]
+
+
+def _dash_theme():
+    t = get_theme()
+    return t["card"], t["border"], t["muted"], t["text"], t["win"], t["loss"], t["alt"], t["orange"]
 
 
 def _layout(height=280, showlegend=False, **kw):
-    return dict(paper_bgcolor=_BG, plot_bgcolor=_BG,
-                font=dict(color=_TEXT, size=12), height=height,
-                margin=dict(l=50, r=20, t=30, b=40),
-                showlegend=showlegend, **kw)
+    bg, grid, muted, *_ = _dash_theme()
+    return dict(paper_bgcolor=bg, plot_bgcolor=bg,
+                font=dict(color=muted, family="Inter, sans-serif", size=12),
+                height=height, margin=dict(l=50, r=20, t=30, b=40),
+                showlegend=showlegend, hovermode="x unified", **kw)
 
 
-def _axes(fig):
-    fig.update_xaxes(gridcolor=_GRID, linecolor=_GRID)
-    fig.update_yaxes(gridcolor=_GRID, linecolor=_GRID)
+def _axes(fig, xprefix="", yprefix=""):
+    _, grid, muted, *_ = _dash_theme()
+    fig.update_xaxes(gridcolor=grid, linecolor=grid, tickcolor=grid,
+                     tickprefix=xprefix, showline=True, zeroline=False)
+    fig.update_yaxes(gridcolor=grid, linecolor=grid, tickcolor=grid,
+                     tickprefix=yprefix, showline=True, zeroline=False)
 
 
-def _kpi(label, value, sub, color):
+def _kpi(icon, label, value, sub, color):
+    bg, grid, muted, text, *_ = _dash_theme()
     st.markdown(
-        f"<div style='background:{_BG};border:1px solid {_GRID};border-radius:14px;"
-        f"padding:16px 18px;min-height:96px'>"
-        f"<div style='font-size:10px;color:#6b7894;letter-spacing:1.5px;"
+        f"<div class='rfh-kpi'>"
+        f"<div class='rfh-kpi-bar' style='background:{color}'></div>"
+        f"<div style='font-size:16px;color:{color};opacity:.9;margin-bottom:6px'>{icon}</div>"
+        f"<div style='font-size:10px;color:{muted};letter-spacing:1.5px;"
         f"text-transform:uppercase;font-weight:600'>{label}</div>"
-        f"<div style='font-size:24px;font-weight:800;font-family:monospace;"
+        f"<div style='font-size:23px;font-weight:800;font-family:JetBrains Mono,monospace;"
         f"color:{color};margin:4px 0'>{value}</div>"
-        f"<div style='font-size:11px;color:#6b7894'>{sub}</div></div>",
+        f"<div style='font-size:11px;color:{muted}'>{sub}</div></div>",
         unsafe_allow_html=True)
+
+
+def _section_title(title, subtitle=""):
+    _, _, muted, text, *_ = _dash_theme()
+    sub_html = f" <span style='font-size:12px;color:{muted};font-weight:400'>{subtitle}</span>" if subtitle else ""
+    st.markdown(
+        f"<div style='margin:6px 0 8px'><span style='font-size:15px;font-weight:700;"
+        f"color:{text}'>{title}</span>{sub_html}</div>", unsafe_allow_html=True)
 
 
 def top_keywords(docs, n=15):
@@ -806,107 +913,194 @@ def top_keywords(docs, n=15):
 
 
 def dashboard_page():
+    bg, grid, muted, text, win, loss, alt, orange = _dash_theme()
+
     st.markdown("## Dashboard des informations")
-    st.caption("Vue analytique de la base documentaire collectée.")
+    st.caption("Vue analytique professionnelle de la base documentaire collectée — "
+               "volume, sources, domaines, tendances et mots-clés.")
 
-    domains_sel = st.multiselect(
-        "Filtrer par domaine",
-        list(DOM_COLORS.keys()), default=list(DOM_COLORS.keys()),
-        key="dash_domains")
+    # ── FILTRES ──────────────────────────────────────────────────────────────
+    st.markdown(f"<div class='rfh-card' style='margin-bottom:18px'>", unsafe_allow_html=True)
+    f1, f2, f3 = st.columns([2.2, 1.4, 1.4])
+    with f1:
+        domains_sel = st.multiselect(
+            "Filtrer par domaine", list(DOM_COLORS.keys()),
+            default=list(DOM_COLORS.keys()), key="dash_domains")
+    with f2:
+        period = st.selectbox("Période", ["7 jours", "14 jours", "30 jours", "Tout"],
+                              index=2, key="dash_period")
+    with f3:
+        search_kw = st.text_input("Recherche titre", placeholder="Ex : Fed, inflation…",
+                                  key="dash_search")
+    st.markdown("</div>", unsafe_allow_html=True)
 
-    docs = load_documents(domains=domains_sel or None, limit=800)
+    docs = load_documents(domains=domains_sel or None, limit=1500)
     if not docs:
-        st.warning("Aucun document. Lancez d'abord une collecte "
-                   "(page **Collecte**).")
+        st.warning("Aucun document. Lancez d'abord une collecte (page **Collecte**).")
         return
 
     df = pd.DataFrame(docs)
     df["published"] = pd.to_datetime(df["published"], errors="coerce", utc=True)
     df["day"] = df["published"].dt.date
+    df["hour"] = df["published"].dt.hour
+    df["weekday"] = df["published"].dt.day_name()
+
+    if period != "Tout":
+        n_days = int(period.split()[0])
+        cutoff = pd.Timestamp.now(tz="UTC") - pd.Timedelta(days=n_days)
+        df = df[df["published"] >= cutoff]
+
+    if search_kw.strip():
+        mask = df["title"].str.contains(search_kw, case=False, na=False) | \
+               df["content"].str.contains(search_kw, case=False, na=False)
+        df = df[mask]
+
+    if df.empty:
+        st.info("Aucun document ne correspond à ces filtres.")
+        return
 
     # ── KPIs ────────────────────────────────────────────────────────────────
-    k1, k2, k3, k4 = st.columns(4)
-    with k1: _kpi("Documents", str(len(df)), "articles en base", "#00d4aa")
-    with k2: _kpi("Sources", str(df["source"].nunique()), "flux distincts", "#7c6aff")
-    with k3: _kpi("Domaines", str(df["domain"].nunique()), "champs couverts", "#ff9f43")
-    with k4:
+    k1, k2, k3, k4, k5 = st.columns(5)
+    n_days_span = max((df["day"].max() - df["day"].min()).days, 1) if len(df) > 1 else 1
+    avg_per_day = len(df) / n_days_span
+    top_domain = df["domain"].value_counts().idxmax() if not df.empty else "—"
+    top_source = df["source"].value_counts().idxmax() if not df.empty else "—"
+
+    with k1: _kpi('<i class="fa-solid fa-file-lines"></i>', "Documents", str(len(df)),
+                  "articles filtrés", win)
+    with k2: _kpi('<i class="fa-solid fa-rss"></i>', "Sources", str(df["source"].nunique()),
+                  "flux distincts", alt)
+    with k3: _kpi('<i class="fa-solid fa-layer-group"></i>', "Domaines", str(df["domain"].nunique()),
+                  "champs couverts", orange)
+    with k4: _kpi('<i class="fa-solid fa-gauge-high"></i>', "Rythme", f"{avg_per_day:.1f}/j",
+                  "articles par jour", "#54a0ff")
+    with k5:
         latest = df["published"].max()
         latest_txt = latest.strftime("%d/%m %H:%M") if pd.notna(latest) else "—"
-        _kpi("Dernier article", latest_txt, "date de publication", "#54a0ff")
+        _kpi('<i class="fa-solid fa-clock"></i>', "Dernier article", latest_txt,
+             "horodatage UTC", loss)
     st.markdown(" ")
 
-    # ── ROW 1 : volume par jour + répartition domaines ──────────────────────
+    # Bandeau domaine/source dominants
+    st.markdown(
+        f"<div style='display:flex;gap:24px;padding:10px 16px;background:{bg};"
+        f"border:1px solid {grid};border-radius:10px;margin-bottom:18px;font-size:13px'>"
+        f"<span style='color:{muted}'>Domaine dominant : "
+        f"<b style='color:{DOM_COLORS.get(top_domain,alt)}'>{top_domain}</b></span>"
+        f"<span style='color:{muted}'>Source la plus active : "
+        f"<b style='color:{text}'>{top_source}</b></span>"
+        f"</div>", unsafe_allow_html=True)
+
+    # ── ROW 1 : Évolution temporelle + Répartition domaines ─────────────────
+    _section_title("Évolution de la collecte", "Volume d'articles dans le temps")
     r1, r2 = st.columns([3, 2])
+
     with r1:
-        st.markdown("#### Volume d'articles par jour")
-        by_day = df.groupby("day").size().reset_index(name="n").dropna()
-        fig1 = go.Figure(go.Bar(
-            x=by_day["day"].astype(str), y=by_day["n"],
-            marker_color="#00d4aa", marker_opacity=0.8,
-            hovertemplate="<b>%{x}</b><br>%{y} articles<extra></extra>"))
-        fig1.update_layout(**_layout(height=260))
+        by_day_dom = df.groupby(["day","domain"]).size().reset_index(name="n")
+        fig1 = go.Figure()
+        for dom in sorted(by_day_dom["domain"].unique()):
+            sub = by_day_dom[by_day_dom["domain"]==dom].sort_values("day")
+            fig1.add_trace(go.Bar(
+                x=sub["day"].astype(str), y=sub["n"], name=dom,
+                marker_color=DOM_COLORS.get(dom, "#8892a4"), marker_opacity=0.85,
+                hovertemplate=f"<b>{dom}</b><br>%{{x}}: %{{y}} articles<extra></extra>"))
+        fig1.update_layout(**_layout(height=300, showlegend=True, barmode="stack"),
+                           legend=dict(orientation="h", y=-0.18, font=dict(color=muted, size=10)))
         _axes(fig1)
         st.plotly_chart(fig1, use_container_width=True)
 
     with r2:
-        st.markdown("#### Répartition par domaine")
         by_dom = df["domain"].value_counts()
         fig2 = go.Figure(go.Pie(
-            values=by_dom.values.tolist(), labels=by_dom.index.tolist(),
-            hole=0.6,
+            values=by_dom.values.tolist(), labels=by_dom.index.tolist(), hole=0.62,
             marker=dict(colors=[DOM_COLORS.get(d, "#8892a4") for d in by_dom.index],
-                        line=dict(color=_BG, width=3)),
-            hovertemplate="<b>%{label}</b>: %{value} (%{percent})<extra></extra>"))
-        fig2.update_layout(**_layout(height=260, showlegend=True),
-                           legend=dict(orientation="h", y=-0.1,
-                                       font=dict(color=_TEXT)))
+                        line=dict(color=bg, width=3)),
+            hovertemplate="<b>%{label}</b>: %{value} (%{percent})<extra></extra>", textinfo="none"))
+        fig2.add_annotation(text=f"<b>{len(df)}</b>", x=0.5, y=0.56,
+            font=dict(size=24,color=text,family="JetBrains Mono"), showarrow=False)
+        fig2.add_annotation(text="articles", x=0.5, y=0.38,
+            font=dict(size=11,color=muted), showarrow=False)
+        fig2.update_layout(**_layout(height=300, showlegend=True),
+                           legend=dict(orientation="h", y=-0.15, font=dict(color=muted, size=10)))
         st.plotly_chart(fig2, use_container_width=True)
 
-    # ── ROW 2 : sources + mots-clés ─────────────────────────────────────────
-    r3, r4 = st.columns(2)
+    # ── ROW 2 : Heatmap activité + Classement sources ────────────────────────
+    _section_title("Intensité de la collecte", "Répartition par domaine et par jour")
+    r3, r4 = st.columns([3, 2])
+
     with r3:
-        st.markdown("#### Articles par source")
-        by_src = df["source"].value_counts().head(10).sort_values()
-        fig3 = go.Figure(go.Bar(
-            y=by_src.index.tolist(), x=by_src.values.tolist(),
-            orientation="h",
-            marker_color=_COLORS[:len(by_src)], marker_opacity=0.85,
-            hovertemplate="<b>%{y}</b>: %{x} articles<extra></extra>"))
-        fig3.update_layout(**_layout(height=max(260, len(by_src) * 36)))
-        _axes(fig3)
-        st.plotly_chart(fig3, use_container_width=True)
+        pivot = df.pivot_table(index="domain", columns="day", values="title",
+                               aggfunc="count", fill_value=0)
+        if not pivot.empty:
+            fig3 = go.Figure(go.Heatmap(
+                z=pivot.values, x=[str(c) for c in pivot.columns], y=pivot.index.tolist(),
+                colorscale=[[0,bg],[0.5,alt+"88"],[1,win]],
+                hovertemplate="<b>%{y} · %{x}</b><br>%{z} articles<extra></extra>",
+                showscale=True,
+                colorbar=dict(tickfont=dict(color=muted, size=10), bgcolor=bg,
+                             bordercolor=grid, thickness=10)))
+            fig3.update_layout(**_layout(height=max(240, len(pivot)*42)))
+            fig3.update_xaxes(gridcolor=grid, linecolor=grid, tickangle=-30, tickfont=dict(size=9))
+            fig3.update_yaxes(gridcolor=grid, linecolor=grid)
+            st.plotly_chart(fig3, use_container_width=True)
+        else:
+            st.info("Pas assez de données pour la heatmap.")
 
     with r4:
-        st.markdown("#### Mots-clés dominants")
+        by_src = df["source"].value_counts().head(8).sort_values()
+        fig4 = go.Figure(go.Bar(
+            y=by_src.index.tolist(), x=by_src.values.tolist(), orientation="h",
+            marker_color=_PALETTE[:len(by_src)], marker_opacity=0.85,
+            text=by_src.values.tolist(), textposition="outside",
+            textfont=dict(color=muted, size=11),
+            hovertemplate="<b>%{y}</b>: %{x} articles<extra></extra>"))
+        fig4.update_layout(**_layout(height=max(240, len(by_src) * 34)))
+        _axes(fig4)
+        st.plotly_chart(fig4, use_container_width=True)
+
+    # ── ROW 3 : Mots-clés + Répartition horaire ──────────────────────────────
+    _section_title("Signaux thématiques", "Mots-clés dominants et rythme de publication")
+    r5, r6 = st.columns(2)
+
+    with r5:
         kws = top_keywords(docs, n=12)
         if kws:
             kw_df = pd.DataFrame(kws, columns=["mot", "n"]).sort_values("n")
-            fig4 = go.Figure(go.Bar(
+            fig5 = go.Figure(go.Bar(
                 y=kw_df["mot"], x=kw_df["n"], orientation="h",
-                marker_color="#7c6aff", marker_opacity=0.85,
+                marker_color=alt, marker_opacity=0.85,
                 hovertemplate="<b>%{y}</b>: %{x} occurrences<extra></extra>"))
-            fig4.update_layout(**_layout(height=max(260, len(kw_df) * 32)))
-            _axes(fig4)
-            st.plotly_chart(fig4, use_container_width=True)
+            fig5.update_layout(**_layout(height=max(260, len(kw_df) * 30)))
+            _axes(fig5)
+            st.plotly_chart(fig5, use_container_width=True)
         else:
             st.info("Pas assez de texte pour extraire des mots-clés.")
 
-    # ── Tableau des derniers articles ───────────────────────────────────────
-    st.markdown("#### Derniers articles")
+    with r6:
+        by_hour = df.groupby("hour").size().reindex(range(24), fill_value=0)
+        fig6 = go.Figure(go.Bar(
+            x=[f"{h:02d}h" for h in by_hour.index], y=by_hour.values,
+            marker_color=orange, marker_opacity=0.8,
+            hovertemplate="<b>%{x}</b>: %{y} articles<extra></extra>"))
+        fig6.update_layout(**_layout(height=max(260, len(kw_df)*30) if kws else 300))
+        _axes(fig6)
+        st.plotly_chart(fig6, use_container_width=True)
+
+    # ── Derniers articles ─────────────────────────────────────────────────────
+    _section_title("Derniers articles", f"{min(20,len(df))} plus récents")
     show = df.sort_values("published", ascending=False).head(20)
     for _, r in show.iterrows():
         dc = DOM_COLORS.get(r["domain"], "#8892a4")
         pub = r["published"].strftime("%d/%m %H:%M") if pd.notna(r["published"]) else ""
         st.markdown(
-            f"<div style='background:{_BG};border:1px solid {_GRID};"
+            f"<div style='background:{bg};border:1px solid {grid};"
             f"border-radius:10px;padding:9px 14px;margin-bottom:6px'>"
             f"<span style='color:{dc};font-size:11px;font-weight:700'>"
             f"{r['domain']}</span> "
-            f"<span style='color:#6b7894;font-size:11px'>· {r['source']} · {pub}</span><br>"
-            f"<a href='{r['url']}' target='_blank' style='color:#e8ecf4;"
+            f"<span style='color:{muted};font-size:11px'>· {r['source']} · {pub}</span><br>"
+            f"<a href='{r['url']}' target='_blank' style='color:{text};"
             f"text-decoration:none'>{r['title'][:120]}</a></div>",
             unsafe_allow_html=True)
-
 
 # ══════════════════════════════════════════════════════════════════════════════
 # NUAGE DE MOTS
@@ -960,8 +1154,8 @@ def wordcloud_page():
                               placeholder="Ex : inflation, bitcoin, or, taux Fed…")
     with tc2:
         domains = st.multiselect(
-            "Domaines", ["Finance", "Trading", "Économie", "Économétrie"],
-            default=["Finance", "Trading", "Économie", "Économétrie"],
+            "Domaines", list(FEEDS.keys()),
+            default=list(FEEDS.keys()),
             key="wc_domains")
 
     max_words = st.slider("Nombre de mots", 30, 150, 80, step=10)
@@ -1154,6 +1348,11 @@ def calendar_page():
 # ══════════════════════════════════════════════════════════════════════════════
 
 # ── Porte d'authentification ──────────────────────────────────────────────────
+if "theme_name" not in st.session_state:
+    st.session_state.theme_name = THEME_NAMES[0]
+
+st.markdown(build_css(get_theme()), unsafe_allow_html=True)
+
 if not login_gate():
     st.stop()
 
@@ -1171,6 +1370,17 @@ PAGES = [
 
 with st.sidebar:
     st.markdown("## RAG Finance Hub")
+
+    _sel_theme = st.selectbox(
+        "Thème", THEME_NAMES,
+        index=THEME_NAMES.index(st.session_state.theme_name)
+              if st.session_state.theme_name in THEME_NAMES else 0,
+        key="theme_selector", label_visibility="collapsed"
+    )
+    if _sel_theme != st.session_state.theme_name:
+        st.session_state.theme_name = _sel_theme
+        st.rerun()
+
     st.caption(f"Connecté : **{st.session_state.auth_user}** "
                f"({st.session_state.auth_role})")
     st.divider()
@@ -1192,9 +1402,10 @@ with st.sidebar:
 
     st.divider()
     n = count_documents()
+    _th = get_theme()
     st.markdown(
-        f"<div style='background:#00d4aa14;border:1px solid #00d4aa44;"
-        f"border-radius:8px;padding:7px 12px;font-size:12px;color:#00d4aa'>"
+        f"<div style='background:{_th['accent']}18;border:1px solid {_th['accent']}44;"
+        f"border-radius:8px;padding:7px 12px;font-size:12px;color:{_th['accent']}'>"
         f"📚 {n} documents en base</div>", unsafe_allow_html=True)
     st.markdown(" ")
     if st.button("  Déconnexion", icon=":material/logout:",
