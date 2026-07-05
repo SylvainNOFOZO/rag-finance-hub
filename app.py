@@ -52,34 +52,34 @@ def get_secret(name: str, default: str = "") -> str:
 # THÈMES
 # ══════════════════════════════════════════════════════════════════════════════
 THEMES = {
-    "Émeraude Sombre": {
-        "bg":"#0a0c12","bg2":"#0d111d","card":"#111520","border":"#1e2535",
-        "text":"#e8ecf4","muted":"#6b7894","accent":"#00d4aa","win":"#00d4aa",
-        "loss":"#ff4d6d","alt":"#7c6aff","orange":"#ff9f43","sidebar":"#0c0f1a",
-        "btn_text":"#000000",
+    "Obsidienne Émeraude": {
+        "bg":"#0b0e13","bg2":"#0f131b","card":"#12161f","border":"#212836",
+        "text":"#e6e9f0","muted":"#8a93a6","accent":"#10b981","win":"#10b981",
+        "loss":"#f43f5e","alt":"#8b5cf6","orange":"#f59e0b","sidebar":"#0d1118",
+        "btn_text":"#04110c",
     },
-    "Indigo Minuit": {
-        "bg":"#0a0a16","bg2":"#0d0d1a","card":"#13131f","border":"#232336",
-        "text":"#eaeaf5","muted":"#7a7a9a","accent":"#6c5ce7","win":"#2ecc91",
-        "loss":"#ff5c7a","alt":"#00cec9","orange":"#fdcb6e","sidebar":"#0e0e1c",
+    "Bloomberg Noir": {
+        "bg":"#050505","bg2":"#0d0d0d","card":"#131313","border":"#2a2a2a",
+        "text":"#f2f2f2","muted":"#9a9a9a","accent":"#ff9900","win":"#00d769",
+        "loss":"#ff433d","alt":"#2797ff","orange":"#ffb300","sidebar":"#0a0a0a",
+        "btn_text":"#1a1000",
+    },
+    "Institutionnel Bleu": {
+        "bg":"#0a1220","bg2":"#0d1728","card":"#101b2e","border":"#1e2f4a",
+        "text":"#e8eefc","muted":"#7d8db0","accent":"#3b82f6","win":"#22c55e",
+        "loss":"#ef4444","alt":"#06b6d4","orange":"#f59e0b","sidebar":"#0b1424",
         "btn_text":"#ffffff",
     },
-    "Ardoise Bleu": {
-        "bg":"#0b0e14","bg2":"#0e1118","card":"#141821","border":"#232a38",
-        "text":"#e5e9f0","muted":"#6f7a8c","accent":"#4fa3ff","win":"#2dd4bf",
-        "loss":"#fb7185","alt":"#a78bfa","orange":"#ffb454","sidebar":"#0d1016",
-        "btn_text":"#0b0e14",
+    "Graphite Pro": {
+        "bg":"#101014","bg2":"#141419","card":"#17171d","border":"#27272f",
+        "text":"#ececf1","muted":"#8e8e9a","accent":"#a78bfa","win":"#34d399",
+        "loss":"#fb7185","alt":"#60a5fa","orange":"#fbbf24","sidebar":"#121217",
+        "btn_text":"#17102b",
     },
-    "Ambre Doré": {
-        "bg":"#100d0a","bg2":"#14110d","card":"#1c1812","border":"#2e2620",
-        "text":"#f5ece0","muted":"#9c8f7c","accent":"#f0a500","win":"#9ed36c",
-        "loss":"#ff6b5e","alt":"#ff7849","orange":"#ffcb47","sidebar":"#120f0b",
-        "btn_text":"#1c1410",
-    },
-    "Ivoire Clair": {
-        "bg":"#f4f5f9","bg2":"#eceef4","card":"#ffffff","border":"#e1e4ec",
-        "text":"#1a1d29","muted":"#6b7280","accent":"#00a884","win":"#00a884",
-        "loss":"#e74c3c","alt":"#6c5ce7","orange":"#e67e22","sidebar":"#ffffff",
+    "Corporate Clair": {
+        "bg":"#f6f7fb","bg2":"#eef0f6","card":"#ffffff","border":"#e3e6ee",
+        "text":"#111827","muted":"#64748b","accent":"#0f766e","win":"#059669",
+        "loss":"#dc2626","alt":"#6d28d9","orange":"#d97706","sidebar":"#ffffff",
         "btn_text":"#ffffff",
     },
 }
@@ -92,33 +92,119 @@ def get_theme():
 
 
 def build_css(t):
+    """CSS professionnel complet — couvre tous les composants Streamlit/BaseWeb."""
     return f"""
 <style>
-@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&family=JetBrains+Mono:wght@400;700&display=swap');
 @import url('https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css');
-.stApp {{ background-color: {t['bg']}; }}
-section[data-testid="stSidebar"] > div {{ background-color:{t['sidebar']}; border-right:1px solid {t['border']}; }}
-h1,h2,h3,h4,h5,h6,p,label,.stMarkdown {{ color:{t['text']} !important; }}
-.stSelectbox label,.stTextInput label,.stMultiSelect label,.stSlider label {{
-    color:{t['muted']} !important; font-size:11px !important;
-    text-transform:uppercase; letter-spacing:1px; }}
-div[data-baseweb="input"] input, div[data-baseweb="textarea"] textarea,
-div[data-baseweb="select"] > div {{
-    background-color:{t['bg2']} !important; border-color:{t['border']} !important; color:{t['text']} !important; }}
-.stButton > button[kind="primary"] {{ background-color:{t['accent']}; color:{t['btn_text']};
-    font-weight:800; border:none; border-radius:10px; }}
-.stButton > button {{ border-radius:10px; font-weight:700; }}
-.stButton > button:hover {{ filter:brightness(0.92); }}
+
+/* ── Base ─────────────────────────────────────────────────────────────── */
+.stApp {{ background: {t['bg']}; font-family:'Inter',sans-serif; }}
+header[data-testid="stHeader"] {{ background: {t['bg']}; }}
+section[data-testid="stSidebar"] > div {{
+    background:{t['sidebar']}; border-right:1px solid {t['border']}; }}
+.block-container {{ padding-top: 2rem; max-width: 1400px; }}
+
+/* ── Typographie ──────────────────────────────────────────────────────── */
+h1,h2,h3,h4,h5,h6 {{ color:{t['text']} !important; font-family:'Inter',sans-serif; }}
+p, label, .stMarkdown p, .stMarkdown li {{ color:{t['text']}; }}
+[data-testid="stCaptionContainer"], small {{ color:{t['muted']} !important; }}
+a {{ color:{t['accent']}; }}
 hr {{ border-color:{t['border']} !important; }}
-div[data-testid="stChatMessage"] {{ background:{t['card']}; border:1px solid {t['border']};
+
+/* ── Labels de widgets ────────────────────────────────────────────────── */
+.stSelectbox label p,.stTextInput label p,.stMultiSelect label p,
+.stSlider label p,.stDateInput label p,.stNumberInput label p,
+.stTextArea label p,.stRadio label p {{
+    color:{t['muted']} !important; font-size:11px !important;
+    text-transform:uppercase; letter-spacing:1px; font-weight:600; }}
+
+/* ── Champs de saisie ─────────────────────────────────────────────────── */
+div[data-baseweb="select"] > div,
+div[data-baseweb="base-input"],
+.stTextInput input, .stNumberInput input, .stTextArea textarea,
+.stDateInput input {{
+    background:{t['bg2']} !important; border-color:{t['border']} !important;
+    color:{t['text']} !important; border-radius:10px; }}
+div[data-baseweb="select"] svg {{ fill:{t['muted']}; }}
+
+/* ── Menus déroulants ─────────────────────────────────────────────────── */
+div[data-baseweb="popover"] > div,
+ul[role="listbox"] {{
+    background:{t['card']} !important; border:1px solid {t['border']} !important;
+    border-radius:10px; }}
+li[role="option"] {{ background:{t['card']} !important; color:{t['text']} !important; }}
+li[role="option"]:hover {{ background:{t['accent']}22 !important; }}
+
+/* ── Chips multiselect ────────────────────────────────────────────────── */
+span[data-baseweb="tag"] {{
+    background:{t['accent']}22 !important; border:1px solid {t['accent']}55 !important;
+    border-radius:8px; }}
+span[data-baseweb="tag"] span {{ color:{t['accent']} !important; }}
+span[data-baseweb="tag"] svg {{ fill:{t['accent']} !important; }}
+
+/* ── Boutons ──────────────────────────────────────────────────────────── */
+.stButton > button {{ border-radius:10px; font-weight:700; transition:all .15s; }}
+.stButton > button[kind="primary"] {{
+    background:{t['accent']}; color:{t['btn_text']}; border:none; font-weight:800; }}
+.stButton > button[kind="primary"]:hover {{ filter:brightness(1.08); }}
+.stButton > button[kind="secondary"] {{
+    background:{t['card']}; color:{t['text']}; border:1px solid {t['border']}; }}
+.stButton > button[kind="secondary"]:hover {{
+    border-color:{t['accent']}; color:{t['accent']}; }}
+.stDownloadButton > button {{
+    background:{t['card']}; color:{t['text']}; border:1px solid {t['border']};
+    border-radius:10px; font-weight:700; }}
+.stDownloadButton > button:hover {{ border-color:{t['accent']}; color:{t['accent']}; }}
+.stFormSubmitButton > button {{
+    background:{t['accent']}; color:{t['btn_text']}; border:none;
+    border-radius:10px; font-weight:800; }}
+
+/* ── Chat ─────────────────────────────────────────────────────────────── */
+div[data-testid="stChatMessage"] {{
+    background:{t['card']}; border:1px solid {t['border']}; border-radius:14px; }}
+div[data-testid="stBottom"] > div {{ background:{t['bg']}; }}
+div[data-testid="stChatInput"] {{
+    background:{t['bg2']}; border:1px solid {t['border']}; border-radius:12px; }}
+div[data-testid="stChatInput"] textarea {{
+    background:transparent !important; color:{t['text']} !important; }}
+
+/* ── Expanders / Forms / Tabs ─────────────────────────────────────────── */
+div[data-testid="stExpander"] details {{
+    background:{t['card']}; border:1px solid {t['border']} !important;
     border-radius:12px; }}
-.rfh-card {{ background:{t['card']}; border:1px solid {t['border']}; border-radius:14px;
-    padding:16px 20px; }}
-.rfh-kpi {{ background:{t['card']}; border:1px solid {t['border']}; border-radius:14px;
-    padding:16px 18px; min-height:100px; position:relative; overflow:hidden; }}
+div[data-testid="stExpander"] summary {{ color:{t['text']} !important; }}
+div[data-testid="stExpander"] summary:hover {{ color:{t['accent']} !important; }}
+div[data-testid="stForm"] {{
+    background:{t['card']}; border:1px solid {t['border']}; border-radius:14px; }}
+.stTabs [data-baseweb="tab-list"] {{ gap:6px; }}
+.stTabs [data-baseweb="tab"] {{
+    background:{t['card']}; border:1px solid {t['border']};
+    border-radius:8px; color:{t['muted']}; padding:6px 16px; }}
+.stTabs [aria-selected="true"] {{
+    color:{t['accent']} !important; border-color:{t['accent']} !important; }}
+
+/* ── Divers ───────────────────────────────────────────────────────────── */
+.stProgress > div > div > div {{ background:{t['accent']}; }}
+.stRadio div[role="radiogroup"] label p {{ color:{t['text']} !important;
+    text-transform:none; font-size:14px !important; letter-spacing:0; }}
+.stCheckbox label p {{ color:{t['text']} !important; text-transform:none;
+    font-size:14px !important; letter-spacing:0; }}
+[data-testid="stMetricValue"] {{ color:{t['text']}; }}
+::-webkit-scrollbar {{ width:10px; height:10px; }}
+::-webkit-scrollbar-track {{ background:{t['bg']}; }}
+::-webkit-scrollbar-thumb {{ background:{t['border']}; border-radius:6px; }}
+::-webkit-scrollbar-thumb:hover {{ background:{t['muted']}; }}
+
+/* ── Composants maison ────────────────────────────────────────────────── */
+.rfh-card {{ background:{t['card']}; border:1px solid {t['border']};
+    border-radius:14px; padding:16px 20px; }}
+.rfh-kpi {{ background:{t['card']}; border:1px solid {t['border']};
+    border-radius:14px; padding:16px 18px; min-height:100px;
+    position:relative; overflow:hidden; }}
 .rfh-kpi-bar {{ position:absolute; top:0; left:0; right:0; height:3px; }}
-.rfh-badge {{ padding:2px 10px; border-radius:20px; font-size:11px; font-weight:700;
-    letter-spacing:.5px; display:inline-block; }}
+.rfh-badge {{ padding:2px 10px; border-radius:20px; font-size:11px;
+    font-weight:700; letter-spacing:.5px; display:inline-block; }}
 </style>
 """
 
@@ -483,6 +569,32 @@ def _sb_docs():
     hdr = {"apikey": key, "Authorization": f"Bearer {key}",
            "Content-Type": "application/json"}
     return f"{url}/rest/v1/rag_documents", hdr
+
+
+@st.cache_data(ttl=3600, show_spinner=False)
+def fetch_article_text(url: str) -> str:
+    """Extrait le texte complet d'un article web (lecture sans visiter le site)."""
+    try:
+        r = requests.get(url, headers=UA, timeout=15)
+        soup = BeautifulSoup(r.content, "html.parser")
+        for tag in soup(["script","style","nav","header","footer",
+                         "aside","form","iframe","noscript"]):
+            tag.decompose()
+        root = soup.find("article") or soup.body or soup
+        parts = []
+        for el in root.find_all(["h2","h3","p","li"]):
+            txt = el.get_text(" ", strip=True)
+            if not txt:
+                continue
+            if el.name in ("h2","h3"):
+                parts.append(f"\n## {txt}\n")
+            elif len(txt) > 60:
+                parts.append(txt)
+        text = "\n\n".join(parts)
+        text = re.sub(r"\n{3,}", "\n\n", text).strip()
+        return text if len(text) > 200 else ""
+    except Exception:
+        return ""
 
 
 def clean_html(raw: str) -> str:
@@ -1091,7 +1203,75 @@ def dashboard_page():
         st.plotly_chart(fig6, use_container_width=True)
 
     # ── Derniers articles ─────────────────────────────────────────────────────
-    _section_title("Derniers articles", f"{min(20,len(df))} plus récents")
+    # ── LECTURE & TÉLÉCHARGEMENT D'ARTICLES ──────────────────────────────────
+    _section_title("Lecture d'articles",
+                   "Extraire et télécharger le contenu complet — sans visiter le site")
+
+    reader_pool = df.sort_values("published", ascending=False).head(60).reset_index(drop=True)
+    opts = [f"{i+1:02d} · {r['title'][:85]} — {r['source']}"
+            for i, r in reader_pool.iterrows()]
+    rc1, rc2 = st.columns([4, 1.3])
+    with rc1:
+        sel_label = st.selectbox("Article à extraire", opts, key="reader_sel",
+                                 label_visibility="collapsed")
+    with rc2:
+        do_extract = st.button("Extraire l'article", icon=":material/article:",
+                               use_container_width=True, type="primary")
+
+    sel_row = reader_pool.iloc[opts.index(sel_label)]
+
+    if do_extract:
+        with st.spinner("Extraction du contenu…"):
+            full_txt = fetch_article_text(sel_row["url"])
+        st.session_state["reader_text"]  = full_txt
+        st.session_state["reader_title"] = sel_row["title"]
+
+    if st.session_state.get("reader_title") == sel_row["title"]:
+        full_txt = st.session_state.get("reader_text", "")
+        pub_s = sel_row["published"].strftime("%d/%m/%Y %H:%M") if pd.notna(sel_row["published"]) else ""
+        if full_txt:
+            file_body = (f"{sel_row['title']}\n{sel_row['source']} · {pub_s}\n"
+                         f"{sel_row['url']}\n\n{'='*70}\n\n{full_txt}")
+            dl1, dl2, _ = st.columns([1.3, 1.3, 3])
+            with dl1:
+                st.download_button("Télécharger (.txt)", data=file_body,
+                    file_name=re.sub(r"[^\w\-]+","_", sel_row["title"][:60]) + ".txt",
+                    mime="text/plain", use_container_width=True,
+                    icon=":material/download:")
+            with dl2:
+                st.download_button("Télécharger (.md)", data=f"# {sel_row['title']}\n\n"
+                    f"*{sel_row['source']} · {pub_s}*  \n<{sel_row['url']}>\n\n{full_txt}",
+                    file_name=re.sub(r"[^\w\-]+","_", sel_row["title"][:60]) + ".md",
+                    mime="text/markdown", use_container_width=True,
+                    icon=":material/download:")
+            with st.expander("Lire l'article ici", expanded=True):
+                st.markdown(full_txt[:12000] +
+                            ("\n\n*…(tronqué — téléchargez pour le texte complet)*"
+                             if len(full_txt) > 12000 else ""))
+        else:
+            st.warning("Extraction impossible (site protégé ou contenu dynamique). "
+                       "Résumé disponible en base :")
+            st.markdown(f"<div class='rfh-card'>{sel_row['content']}</div>",
+                        unsafe_allow_html=True)
+            st.download_button("Télécharger le résumé (.txt)",
+                data=f"{sel_row['title']}\n{sel_row['url']}\n\n{sel_row['content']}",
+                file_name=re.sub(r"[^\w\-]+","_", sel_row["title"][:60]) + ".txt",
+                mime="text/plain", icon=":material/download:")
+
+    st.markdown(" ")
+
+    # ── DERNIERS ARTICLES + EXPORT GLOBAL ────────────────────────────────────
+    hd1, hd2 = st.columns([4, 1.4])
+    with hd1:
+        _section_title("Derniers articles", f"{min(20,len(df))} plus récents")
+    with hd2:
+        exp_df = df[["domain","source","title","url","published","content"]].copy()
+        exp_df["published"] = exp_df["published"].astype(str)
+        st.download_button("Exporter tout (CSV)",
+            data=exp_df.to_csv(index=False).encode("utf-8"),
+            file_name="rag_finance_articles.csv", mime="text/csv",
+            use_container_width=True, icon=":material/table_view:")
+
     show = df.sort_values("published", ascending=False).head(20)
     for _, r in show.iterrows():
         dc = DOM_COLORS.get(r["domain"], "#8892a4")
