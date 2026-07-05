@@ -180,7 +180,8 @@ def authenticate(username: str, password: str):
     ep, hdr = _users_ep()
     debug = {"endpoint": ep, "apikey_len": len(hdr.get("apikey", ""))}
     try:
-        r = requests.get(f"{ep}?username=eq.{username}&select=*", headers=hdr, timeout=8)
+        r = requests.get(ep, headers=hdr, timeout=8,
+                         params={"username": f"eq.{username}", "select": "*"})
         debug["status"] = r.status_code
         debug["body"] = r.text[:300]
         st.session_state["_last_auth_debug"] = debug
@@ -557,14 +558,13 @@ def save_documents(docs: list):
 
 
 def load_documents(domains: list = None, limit: int = 800):
-    """Charge les documents depuis Supabase."""
+    """Charge les documents depuis Supabase (params URL-encodés par requests)."""
     ep, hdr = _sb_docs()
-    q = f"{ep}?select=*&order=published.desc&limit={limit}"
+    params = {"select": "*", "order": "published.desc", "limit": str(limit)}
     if domains:
-        dom_list = ",".join(f'"{d}"' for d in domains)
-        q += f"&domain=in.({dom_list})"
+        params["domain"] = "in.(" + ",".join(f'"{d}"' for d in domains) + ")"
     try:
-        r = requests.get(q, headers=hdr, timeout=15)
+        r = requests.get(ep, headers=hdr, params=params, timeout=15)
         return r.json() if r.status_code == 200 else []
     except Exception:
         return []
