@@ -509,56 +509,88 @@ def admin_panel():
 # ══════════════════════════════════════════════════════════════════════════════
 FEEDS = {
     "Finance": [
-        ("Yahoo Finance",      "https://finance.yahoo.com/news/rssindex"),
-        ("Les Échos Marchés",  "https://services.lesechos.fr/rss/les-echos-finance-marches.xml"),
-        ("Investing FR",       "https://fr.investing.com/rss/news.rss"),
-        ("CNBC Finance",       "https://search.cnbc.com/rs/search/combinedcms/view.xml?partnerId=wrss01&id=10000664"),
-        ("MarketWatch",        "https://feeds.content.dowjones.io/public/rss/mw_topstories"),
-        ("Seeking Alpha",      "https://seekingalpha.com/market_currents.xml"),
-        ("Boursorama",         "https://www.boursorama.com/rss/actualites/dernieres-infos.xml"),
-        ("Capital.fr",         "https://www.capital.fr/rss"),
+        # Français
+        ("Les Échos Marchés",  "https://services.lesechos.fr/rss/les-echos-finance-marches.xml", "FR"),
+        ("Investing FR",       "https://fr.investing.com/rss/news.rss", "FR"),
+        ("Boursorama",         "https://www.boursorama.com/rss/actualites/dernieres-infos.xml", "FR"),
+        ("Capital.fr",         "https://www.capital.fr/rss", "FR"),
+        ("Zonebourse",         "https://www.zonebourse.com/rss/actualites.xml", "FR"),
+        # Anglais
+        ("Yahoo Finance",      "https://finance.yahoo.com/news/rssindex", "EN"),
+        ("CNBC Finance",       "https://search.cnbc.com/rs/search/combinedcms/view.xml?partnerId=wrss01&id=10000664", "EN"),
+        ("MarketWatch",        "https://feeds.content.dowjones.io/public/rss/mw_topstories", "EN"),
+        ("WSJ Markets",        "https://feeds.a.dj.com/rss/RSSMarketsMain.xml", "EN"),
+        ("Seeking Alpha",      "https://seekingalpha.com/market_currents.xml", "EN"),
+        ("Fortune",            "https://fortune.com/feed/", "EN"),
+        ("Business Insider",   "https://markets.businessinsider.com/rss/news", "EN"),
     ],
     "Trading": [
-        ("FXStreet",           "https://www.fxstreet.com/rss/news"),
-        ("ForexLive",          "https://www.forexlive.com/feed/news"),
-        ("DailyForex",         "https://www.dailyforex.com/rss/forexnews.xml"),
-        ("Investing Commodities","https://fr.investing.com/rss/news_11.rss"),
-        ("Kitco News",         "https://www.kitco.com/rss/KitcoNews.xml"),
-        ("Investing Technical","https://fr.investing.com/rss/news_25.rss"),
+        # Français
+        ("Investing Techniques FR", "https://fr.investing.com/rss/news_25.rss", "FR"),
+        ("Investing Forex FR", "https://fr.investing.com/rss/news_1.rss", "FR"),
+        # Anglais
+        ("FXStreet",           "https://www.fxstreet.com/rss/news", "EN"),
+        ("ForexLive",          "https://www.forexlive.com/feed/news", "EN"),
+        ("DailyForex",         "https://www.dailyforex.com/rss/forexnews.xml", "EN"),
+        ("Kitco News",         "https://www.kitco.com/rss/KitcoNews.xml", "EN"),
+        ("FXEmpire",           "https://www.fxempire.com/api/v1/en/articles/rss/news", "EN"),
+        ("Action Forex",       "https://www.actionforex.com/feed/", "EN"),
+        ("Babypips",           "https://www.babypips.com/feed.rss", "EN"),
     ],
     "Économie": [
-        ("Le Monde Économie",  "https://www.lemonde.fr/economie/rss_full.xml"),
-        ("Les Échos Économie", "https://services.lesechos.fr/rss/les-echos-economie.xml"),
-        ("VoxEU / CEPR",       "https://cepr.org/rss/voxeu"),
-        ("La Tribune",         "https://www.latribune.fr/feed.xml"),
-        ("Challenges Éco",     "https://www.challenges.fr/rss.xml"),
-        ("Federal Reserve",    "https://www.federalreserve.gov/feeds/press_all.xml"),
-        ("BCE — Communiqués",  "https://www.ecb.europa.eu/rss/press.xml"),
-        ("Bank of England",    "https://www.bankofengland.co.uk/rss/news"),
+        # Français
+        ("Le Monde Économie",  "https://www.lemonde.fr/economie/rss_full.xml", "FR"),
+        ("Les Échos Économie", "https://services.lesechos.fr/rss/les-echos-economie.xml", "FR"),
+        ("La Tribune",         "https://www.latribune.fr/feed.xml", "FR"),
+        ("Challenges",         "https://www.challenges.fr/rss.xml", "FR"),
+        ("Alternatives Éco",   "https://www.alternatives-economiques.fr/rss.xml", "FR"),
+        # Anglais
+        ("VoxEU / CEPR",       "https://cepr.org/rss/voxeu", "EN"),
+        ("The Economist",      "https://www.economist.com/finance-and-economics/rss.xml", "EN"),
+        ("BBC Business",       "http://feeds.bbci.co.uk/news/business/rss.xml", "EN"),
+        ("IMF Blog",           "https://www.imf.org/en/Blogs/rss", "EN"),
+        ("World Bank Blogs",   "https://blogs.worldbank.org/rss.xml", "EN"),
+        ("Project Syndicate",  "https://www.project-syndicate.org/rss", "EN"),
+        ("Federal Reserve",    "https://www.federalreserve.gov/feeds/press_all.xml", "EN"),
+        ("BCE — Communiqués",  "https://www.ecb.europa.eu/rss/press.xml", "EN"),
+        ("Bank of England",    "https://www.bankofengland.co.uk/rss/news", "EN"),
     ],
     "Économétrie": [
-        ("arXiv Econometrics", "https://arxiv.org/rss/econ.EM"),
-        ("arXiv Stat Finance", "https://arxiv.org/rss/q-fin.ST"),
-        ("arXiv Applied Stats","https://arxiv.org/rss/stat.AP"),
-        ("arXiv Risk Mgmt",    "https://arxiv.org/rss/q-fin.RM"),
-        ("arXiv Portfolio Mgmt","https://arxiv.org/rss/q-fin.PM"),
-        ("arXiv General Finance","https://arxiv.org/rss/q-fin.GN"),
+        ("arXiv Econometrics", "https://arxiv.org/rss/econ.EM", "EN"),
+        ("arXiv Stat Finance", "https://arxiv.org/rss/q-fin.ST", "EN"),
+        ("arXiv Applied Stats","https://arxiv.org/rss/stat.AP", "EN"),
+        ("arXiv Risk Mgmt",    "https://arxiv.org/rss/q-fin.RM", "EN"),
+        ("arXiv Portfolio",    "https://arxiv.org/rss/q-fin.PM", "EN"),
+        ("arXiv Gen Finance",  "https://arxiv.org/rss/q-fin.GN", "EN"),
+        ("NBER Working Papers","https://back.nber.org/rss/new.xml", "EN"),
     ],
     "Crypto": [
-        ("CoinDesk",           "https://www.coindesk.com/arc/outboundfeeds/rss/"),
-        ("CoinTelegraph",      "https://cointelegraph.com/rss"),
-        ("Investing Crypto",   "https://fr.investing.com/rss/news_301.rss"),
+        # Français
+        ("Journal du Coin",    "https://journalducoin.com/feed/", "FR"),
+        ("Cryptoast",          "https://cryptoast.fr/feed/", "FR"),
+        ("Investing Crypto FR","https://fr.investing.com/rss/news_301.rss", "FR"),
+        # Anglais
+        ("CoinDesk",           "https://www.coindesk.com/arc/outboundfeeds/rss/", "EN"),
+        ("CoinTelegraph",      "https://cointelegraph.com/rss", "EN"),
+        ("Decrypt",            "https://decrypt.co/feed", "EN"),
+        ("Bitcoin Magazine",   "https://bitcoinmagazine.com/feed", "EN"),
+        ("The Block",          "https://www.theblock.co/rss.xml", "EN"),
     ],
     "Matières Premières": [
-        ("OilPrice.com",       "https://oilprice.com/rss/main"),
-        ("Kitco Commodities",  "https://www.kitco.com/rss/KitcoCommodities.xml"),
-        ("Investing Énergie",  "https://fr.investing.com/rss/news_11.rss"),
+        ("Investing Énergie FR","https://fr.investing.com/rss/news_11.rss", "FR"),
+        ("OilPrice.com",       "https://oilprice.com/rss/main", "EN"),
+        ("Kitco Commodities",  "https://www.kitco.com/rss/KitcoCommodities.xml", "EN"),
+        ("Mining.com",         "https://www.mining.com/feed/", "EN"),
     ],
     "Géopolitique & Marchés": [
-        ("Le Monde International","https://www.lemonde.fr/international/rss_full.xml"),
-        ("Les Échos Monde",    "https://services.lesechos.fr/rss/les-echos-monde.xml"),
+        ("Le Monde International","https://www.lemonde.fr/international/rss_full.xml", "FR"),
+        ("Les Échos Monde",    "https://services.lesechos.fr/rss/les-echos-monde.xml", "FR"),
+        ("BBC World",          "http://feeds.bbci.co.uk/news/world/rss.xml", "EN"),
+        ("Foreign Policy",     "https://foreignpolicy.com/feed/", "EN"),
+        ("Al Jazeera",         "https://www.aljazeera.com/xml/rss/all.xml", "EN"),
     ],
 }
+LANGS = ["FR", "EN"]
 
 UA = {"User-Agent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 RAGFinanceHub/1.0"}
 
@@ -608,8 +640,9 @@ def clean_html(raw: str) -> str:
     return re.sub(r"\s+", " ", text).strip()
 
 
-def fetch_feed(source_name: str, feed_url: str, domain: str, max_items: int = 15):
-    """Parse un flux RSS → liste de documents."""
+def fetch_feed(source_name: str, feed_url: str, domain: str, lang: str = "FR",
+               max_items: int = 25, date_from=None, date_to=None):
+    """Parse un flux RSS → liste de documents (filtrés par plage de dates)."""
     docs = []
     try:
         resp = requests.get(feed_url, headers=UA, timeout=12)
@@ -618,11 +651,18 @@ def fetch_feed(source_name: str, feed_url: str, domain: str, max_items: int = 15
             title = clean_html(entry.get("title", ""))
             summary = clean_html(entry.get("summary", entry.get("description", "")))
             link = entry.get("link", "")
-            pub = entry.get("published", entry.get("updated", ""))
             try:
-                pub_dt = datetime(*entry.published_parsed[:6]).isoformat()
+                pub_dt = datetime(*entry.published_parsed[:6])
             except Exception:
-                pub_dt = datetime.now().isoformat()
+                try:
+                    pub_dt = datetime(*entry.updated_parsed[:6])
+                except Exception:
+                    pub_dt = datetime.now()
+            # Filtre par plage de dates
+            if date_from and pub_dt.date() < date_from:
+                continue
+            if date_to and pub_dt.date() > date_to:
+                continue
             if title and link:
                 docs.append({
                     "domain": domain,
@@ -630,21 +670,26 @@ def fetch_feed(source_name: str, feed_url: str, domain: str, max_items: int = 15
                     "url": link,
                     "content": f"{title}. {summary}"[:4000],
                     "source": source_name,
-                    "published": pub_dt,
+                    "published": pub_dt.isoformat(),
+                    "lang": lang,
                 })
     except Exception:
         pass
     return docs
 
 
-def scrape_domains(domains: list, progress_cb=None):
-    """Scrape tous les flux des domaines sélectionnés."""
+def scrape_domains(domains: list, langs: list = None, date_from=None,
+                   date_to=None, progress_cb=None):
+    """Scrape les flux des domaines sélectionnés, filtrés par langue et dates."""
+    langs = langs or LANGS
     all_docs = []
-    tasks = [(d, s, u) for d in domains for (s, u) in FEEDS.get(d, [])]
-    for i, (domain, sname, surl) in enumerate(tasks):
+    tasks = [(d, s, u, lg) for d in domains
+             for (s, u, lg) in FEEDS.get(d, []) if lg in langs]
+    for i, (domain, sname, surl, lg) in enumerate(tasks):
         if progress_cb:
-            progress_cb((i + 1) / len(tasks), f"{domain} · {sname}")
-        all_docs.extend(fetch_feed(sname, surl, domain))
+            progress_cb((i + 1) / max(len(tasks), 1), f"{domain} · {sname} [{lg}]")
+        all_docs.extend(fetch_feed(sname, surl, domain, lg,
+                                   date_from=date_from, date_to=date_to))
     return all_docs
 
 
@@ -669,17 +714,42 @@ def save_documents(docs: list):
     return inserted
 
 
-def load_documents(domains: list = None, limit: int = 800):
-    """Charge les documents depuis Supabase (params URL-encodés par requests)."""
+def load_documents(domains: list = None, limit: int = 800, langs: list = None,
+                   sources: list = None, date_from=None, date_to=None,
+                   search: str = None):
+    """Charge les documents depuis Supabase avec filtres avancés."""
     ep, hdr = _sb_docs()
-    params = {"select": "*", "order": "published.desc", "limit": str(limit)}
+    params = [("select", "*"), ("order", "published.desc"), ("limit", str(limit))]
     if domains:
-        params["domain"] = "in.(" + ",".join(f'"{d}"' for d in domains) + ")"
+        params.append(("domain", "in.(" + ",".join(f'"{d}"' for d in domains) + ")"))
+    if langs:
+        params.append(("lang", "in.(" + ",".join(f'"{l}"' for l in langs) + ")"))
+    if sources:
+        params.append(("source", "in.(" + ",".join(f'"{s}"' for s in sources) + ")"))
+    if date_from:
+        params.append(("published", f"gte.{date_from.isoformat()}"))
+    if date_to:
+        params.append(("published", f"lte.{date_to.isoformat()}T23:59:59"))
+    if search and search.strip():
+        params.append(("title", f"ilike.*{search.strip()}*"))
     try:
         r = requests.get(ep, headers=hdr, params=params, timeout=15)
         return r.json() if r.status_code == 200 else []
     except Exception:
         return []
+
+
+def list_sources():
+    """Liste distincte des sources présentes en base."""
+    ep, hdr = _sb_docs()
+    try:
+        r = requests.get(ep, headers=hdr, timeout=10,
+                         params=[("select", "source"), ("limit", "2000")])
+        if r.status_code == 200:
+            return sorted({row.get("source","") for row in r.json() if row.get("source")})
+    except Exception:
+        pass
+    return []
 
 
 def count_documents():
@@ -717,17 +787,36 @@ def scraper_page():
         f"<b style='color:{_t['accent']};font-size:20px;font-family:monospace'>{n_docs}</b></div>",
         unsafe_allow_html=True)
 
-    domains = st.multiselect(
-        "Domaines à scraper",
-        list(FEEDS.keys()),
-        default=list(FEEDS.keys()),
-    )
+    sc1, sc2 = st.columns([2.4, 1.2])
+    with sc1:
+        domains = st.multiselect(
+            "Domaines à scraper",
+            list(FEEDS.keys()),
+            default=list(FEEDS.keys()),
+        )
+    with sc2:
+        langs_sel = st.multiselect("Langues", LANGS, default=LANGS,
+                                   key="scrape_langs")
+
+    dc1, dc2, dc3 = st.columns([1.2, 1.2, 2])
+    from datetime import timedelta as _td
+    with dc1:
+        date_from = st.date_input("Publié à partir du",
+                                  value=datetime.now().date() - _td(days=7),
+                                  key="scrape_from")
+    with dc2:
+        date_to = st.date_input("Jusqu'au", value=datetime.now().date(),
+                                key="scrape_to")
+    with dc3:
+        st.caption("Les flux RSS n'exposent que les articles récents (~25 derniers "
+                   "par source). La plage de dates filtre parmi ces articles ; "
+                   "les archives anciennes ne sont pas accessibles via RSS.")
 
     with st.expander("Sources par domaine"):
         for d in domains:
             st.markdown(f"**{d}**")
-            for sname, surl in FEEDS[d]:
-                st.markdown(f"- {sname} — `{surl}`")
+            for sname, surl, lg in FEEDS[d]:
+                st.markdown(f"- `[{lg}]` {sname} — `{surl}`")
 
     c1, c2 = st.columns([1, 1])
     with c1:
@@ -738,7 +827,8 @@ def scraper_page():
             else:
                 pbar = st.progress(0.0, text="Initialisation…")
                 docs = scrape_domains(
-                    domains,
+                    domains, langs=langs_sel or LANGS,
+                    date_from=date_from, date_to=date_to,
                     progress_cb=lambda p, txt: pbar.progress(p, text=f"Scraping : {txt}"))
                 pbar.progress(1.0, text="Sauvegarde en base…")
                 n = save_documents(docs)
@@ -1287,6 +1377,154 @@ def dashboard_page():
             unsafe_allow_html=True)
 
 # ══════════════════════════════════════════════════════════════════════════════
+# BIBLIOTHÈQUE — Tous les éléments scrapés avec résumés
+# ══════════════════════════════════════════════════════════════════════════════
+def library_page():
+    bg, grid, muted, text, win, loss, alt, orange = _dash_theme()
+    t = get_theme()
+
+    st.markdown("## Bibliothèque")
+    st.caption("Tous les articles collectés — résumés, filtres avancés, lecture "
+               "intégrale et téléchargement.")
+
+    # ── FILTRES ──────────────────────────────────────────────────────────────
+    with st.container():
+        lf1, lf2, lf3 = st.columns([2, 1, 1])
+        with lf1:
+            lib_domains = st.multiselect("Domaines", list(FEEDS.keys()),
+                                         default=[], key="lib_domains",
+                                         placeholder="Tous les domaines")
+        with lf2:
+            lib_langs = st.multiselect("Langues", LANGS, default=[],
+                                       key="lib_langs", placeholder="Toutes")
+        with lf3:
+            lib_search = st.text_input("Recherche titre", key="lib_search",
+                                       placeholder="Ex : inflation…")
+
+        lf4, lf5, lf6 = st.columns([1, 1, 2])
+        from datetime import timedelta as _td2
+        with lf4:
+            lib_from = st.date_input("Du", value=None, key="lib_from")
+        with lf5:
+            lib_to = st.date_input("Au", value=None, key="lib_to")
+        with lf6:
+            all_sources = list_sources()
+            lib_sources = st.multiselect("Sources", all_sources, default=[],
+                                         key="lib_sources",
+                                         placeholder="Toutes les sources")
+
+    docs = load_documents(
+        domains=lib_domains or None,
+        langs=lib_langs or None,
+        sources=lib_sources or None,
+        date_from=lib_from, date_to=lib_to,
+        search=lib_search, limit=1000)
+
+    if not docs:
+        st.info("Aucun article ne correspond à ces filtres. "
+                "Lancez une collecte ou élargissez les critères.")
+        return
+
+    df = pd.DataFrame(docs)
+    df["published"] = pd.to_datetime(df["published"], errors="coerce", utc=True)
+    df = df.sort_values("published", ascending=False).reset_index(drop=True)
+
+    # ── EN-TÊTE : compteur + export ──────────────────────────────────────────
+    h1, h2 = st.columns([3, 1.3])
+    with h1:
+        st.markdown(
+            f"<div style='padding:8px 0;font-size:14px;color:{muted}'>"
+            f"<b style='color:{t['accent']};font-size:20px;font-family:JetBrains Mono,monospace'>"
+            f"{len(df)}</b> articles trouvés</div>", unsafe_allow_html=True)
+    with h2:
+        exp = df[["domain","lang","source","title","url","published","content"]].copy()
+        exp["published"] = exp["published"].astype(str)
+        st.download_button("Exporter (CSV)", data=exp.to_csv(index=False).encode("utf-8"),
+            file_name="bibliotheque_rag.csv", mime="text/csv",
+            use_container_width=True, icon=":material/table_view:")
+
+    # ── PAGINATION ───────────────────────────────────────────────────────────
+    PAGE_SIZE = 15
+    n_pages = max(1, (len(df) - 1) // PAGE_SIZE + 1)
+    if "lib_page" not in st.session_state:
+        st.session_state.lib_page = 1
+    st.session_state.lib_page = min(st.session_state.lib_page, n_pages)
+
+    pg1, pg2, pg3 = st.columns([1, 2, 1])
+    with pg1:
+        if st.button("← Précédent", disabled=st.session_state.lib_page <= 1,
+                     use_container_width=True, key="lib_prev"):
+            st.session_state.lib_page -= 1; st.rerun()
+    with pg2:
+        st.markdown(f"<div style='text-align:center;padding-top:8px;color:{muted}'>"
+                    f"Page <b style='color:{text}'>{st.session_state.lib_page}</b> / {n_pages}</div>",
+                    unsafe_allow_html=True)
+    with pg3:
+        if st.button("Suivant →", disabled=st.session_state.lib_page >= n_pages,
+                     use_container_width=True, key="lib_next"):
+            st.session_state.lib_page += 1; st.rerun()
+
+    start_i = (st.session_state.lib_page - 1) * PAGE_SIZE
+    page_df = df.iloc[start_i:start_i + PAGE_SIZE]
+
+    # ── CARTES ARTICLES ──────────────────────────────────────────────────────
+    for i, r in page_df.iterrows():
+        dc = DOM_COLORS.get(r["domain"], muted)
+        pub = r["published"].strftime("%d/%m/%Y %H:%M") if pd.notna(r["published"]) else "—"
+        lang_badge = r.get("lang", "?") or "?"
+        summary = (r.get("content") or "")
+        # Retirer le titre dupliqué au début du résumé
+        if summary.startswith(r["title"]):
+            summary = summary[len(r["title"]):].lstrip(". ")
+        short = summary[:280] + ("…" if len(summary) > 280 else "")
+
+        st.markdown(
+            f"<div style='background:{bg};border:1px solid {grid};border-radius:12px;"
+            f"padding:14px 18px;margin-bottom:4px'>"
+            f"<span class='rfh-badge' style='background:{dc}22;color:{dc};"
+            f"border:1px solid {dc}55'>{r['domain']}</span> "
+            f"<span class='rfh-badge' style='background:{alt}22;color:{alt};"
+            f"border:1px solid {alt}55'>{lang_badge}</span> "
+            f"<span style='color:{muted};font-size:11px'> {r['source']} · {pub}</span>"
+            f"<div style='margin-top:8px'><a href='{r['url']}' target='_blank' "
+            f"style='color:{text};text-decoration:none;font-weight:700;font-size:15px'>"
+            f"{r['title']}</a></div>"
+            f"<div style='margin-top:6px;color:{muted};font-size:13px;line-height:1.5'>"
+            f"{short}</div></div>",
+            unsafe_allow_html=True)
+
+        with st.expander("Résumé complet · Lecture intégrale · Téléchargement"):
+            st.markdown(f"**Résumé (base documentaire) :**")
+            st.markdown(summary if summary else "*Pas de résumé disponible.*")
+            st.markdown("---")
+            ext_key = f"lib_ext_{i}"
+            if st.button("Extraire le texte intégral", key=f"btn_{ext_key}",
+                         icon=":material/article:"):
+                with st.spinner("Extraction…"):
+                    st.session_state[ext_key] = fetch_article_text(r["url"])
+            full = st.session_state.get(ext_key)
+            if full is not None:
+                if full:
+                    st.markdown(full[:10000] +
+                                ("\n\n*…(tronqué — téléchargez le fichier complet)*"
+                                 if len(full) > 10000 else ""))
+                    fname = re.sub(r"[^\w\-]+", "_", r["title"][:60])
+                    st.download_button("Télécharger (.txt)",
+                        data=f"{r['title']}\n{r['source']} · {pub}\n{r['url']}\n\n"
+                             f"{'='*70}\n\n{full}",
+                        file_name=fname + ".txt", mime="text/plain",
+                        key=f"dl_{ext_key}", icon=":material/download:")
+                else:
+                    st.warning("Extraction impossible (site protégé). "
+                               "Le résumé ci-dessus reste téléchargeable :")
+                    fname = re.sub(r"[^\w\-]+", "_", r["title"][:60])
+                    st.download_button("Télécharger le résumé (.txt)",
+                        data=f"{r['title']}\n{r['url']}\n\n{summary}",
+                        file_name=fname + ".txt", mime="text/plain",
+                        key=f"dls_{ext_key}", icon=":material/download:")
+
+
+# ══════════════════════════════════════════════════════════════════════════════
 # NUAGE DE MOTS
 # ══════════════════════════════════════════════════════════════════════════════
 def build_wordcloud(theme: str, domains=None, max_words: int = 80):
@@ -1547,6 +1785,7 @@ if "nav" not in st.session_state:
 PAGES = [
     ("chat",      "Chatbot",     ":material/forum:"),
     ("scrape",    "Collecte",    ":material/travel_explore:"),
+    ("library",   "Bibliothèque", ":material/local_library:"),
     ("dash",      "Dashboard",   ":material/monitoring:"),
     ("cloud",     "Nuage de mots", ":material/cloud:"),
     ("calendar",  "Annonces éco", ":material/event:"),
@@ -1602,6 +1841,8 @@ if nav == "chat":
     chatbot_page()
 elif nav == "scrape":
     scraper_page()
+elif nav == "library":
+    library_page()
 elif nav == "dash":
     dashboard_page()
 elif nav == "cloud":
