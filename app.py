@@ -391,7 +391,7 @@ FEEDS = {
 UA = {"User-Agent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 RAGFinanceHub/1.0"}
 
 
-def _sb():
+def _sb_docs():
     url = get_secret("SUPABASE_URL")
     key = get_secret("SUPABASE_KEY")
     hdr = {"apikey": key, "Authorization": f"Bearer {key}",
@@ -454,7 +454,7 @@ def save_documents(docs: list):
     """Upsert dans Supabase (dédupliqué par URL). Retourne le nb inséré."""
     if not docs:
         return 0
-    ep, hdr = _sb()
+    ep, hdr = _sb_docs()
     inserted = 0
     # Insertion par lots de 50
     for i in range(0, len(docs), 50):
@@ -473,7 +473,7 @@ def save_documents(docs: list):
 
 def load_documents(domains: list = None, limit: int = 800):
     """Charge les documents depuis Supabase."""
-    ep, hdr = _sb()
+    ep, hdr = _sb_docs()
     q = f"{ep}?select=*&order=published.desc&limit={limit}"
     if domains:
         dom_list = ",".join(f'"{d}"' for d in domains)
@@ -486,7 +486,7 @@ def load_documents(domains: list = None, limit: int = 800):
 
 
 def count_documents():
-    ep, hdr = _sb()
+    ep, hdr = _sb_docs()
     try:
         r = requests.get(f"{ep}?select=id", headers={**hdr, "Prefer": "count=exact"},
                          timeout=10)
@@ -497,7 +497,7 @@ def count_documents():
 
 
 def delete_all_documents():
-    ep, hdr = _sb()
+    ep, hdr = _sb_docs()
     try:
         r = requests.delete(f"{ep}?id=gt.0", headers=hdr, timeout=20)
         return r.status_code in (200, 204)
