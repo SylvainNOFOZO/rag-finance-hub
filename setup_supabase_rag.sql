@@ -24,6 +24,7 @@ CREATE TABLE IF NOT EXISTS rag_documents (
     content    TEXT,
     source     TEXT,
     published  TIMESTAMPTZ,
+    lang       TEXT DEFAULT 'FR',
     scraped_at TIMESTAMPTZ DEFAULT NOW()
 );
 ALTER TABLE rag_documents ENABLE ROW LEVEL SECURITY;
@@ -33,3 +34,8 @@ CREATE POLICY allow_all_docs ON rag_documents FOR ALL USING (true) WITH CHECK (t
 -- Index pour accélérer les requêtes
 CREATE INDEX IF NOT EXISTS idx_rag_docs_domain    ON rag_documents(domain);
 CREATE INDEX IF NOT EXISTS idx_rag_docs_published ON rag_documents(published DESC);
+
+-- Migration : ajout de la colonne lang si base existante
+ALTER TABLE rag_documents ADD COLUMN IF NOT EXISTS lang TEXT DEFAULT 'FR';
+CREATE INDEX IF NOT EXISTS idx_rag_docs_lang ON rag_documents(lang);
+NOTIFY pgrst, 'reload schema';
