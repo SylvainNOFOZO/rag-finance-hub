@@ -120,10 +120,14 @@ def bootstrap_admin():
 def authenticate(username: str, password: str):
     """Retourne (ok, role, message)."""
     ep, hdr = _users_ep()
+    debug = {"endpoint": ep, "apikey_len": len(hdr.get("apikey", ""))}
     try:
         r = requests.get(f"{ep}?username=eq.{username}&select=*", headers=hdr, timeout=8)
+        debug["status"] = r.status_code
+        debug["body"] = r.text[:300]
+        st.session_state["_last_auth_debug"] = debug
         if r.status_code != 200:
-            return False, None, f"Erreur serveur ({r.status_code})"
+            return False, None, f"Erreur serveur ({r.status_code}) — voir détails techniques ci-dessous."
         rows = r.json()
         if not rows:
             return False, None, "Identifiants incorrects."
@@ -134,6 +138,8 @@ def authenticate(username: str, password: str):
             return True, u.get("role", "user"), "OK"
         return False, None, "Identifiants incorrects."
     except Exception as e:
+        debug["exception"] = str(e)
+        st.session_state["_last_auth_debug"] = debug
         return False, None, f"Erreur connexion : {e}"
 
 
@@ -231,6 +237,21 @@ def login_gate():
                     st.error(msg)
         st.caption("Accès sur invitation uniquement — contactez l'administrateur "
                    "pour obtenir vos identifiants.")
+
+        dbg = st.session_state.get("_last_auth_debug")
+        if dbg:
+            with st.expander("Détails techniques (diagnostic)"):
+                st.markdown(f"**Endpoint appelé** : `{dbg.get('endpoint','')}`")
+                st.markdown(f"**Longueur clé API envoyée** : {dbg.get('apikey_len',0)} "
+                            f"caractères {'⚠️ (0 = secret manquant)' if not dbg.get('apikey_len') else ''}")
+                if "status" in dbg:
+                    st.markdown(f"**Code HTTP reçu** : {dbg['status']}")
+                    st.code(dbg.get("body",""), language="json")
+                if "exception" in dbg:
+                    st.markdown(f"**Exception Python** : `{dbg['exception']}`")
+                url_val = get_secret("SUPABASE_URL")
+                st.markdown(f"**SUPABASE_URL lu** : `{url_val}` "
+                            f"({'vide ⚠️' if not url_val else 'OK' if url_val.startswith('https://') else 'format suspect ⚠️'})")
     return False
 
 
