@@ -1032,9 +1032,13 @@ def dashboard_page():
         pivot = df.pivot_table(index="domain", columns="day", values="title",
                                aggfunc="count", fill_value=0)
         if not pivot.empty:
+            def _hex2rgba(h, a=1.0):
+                h = h.lstrip("#")
+                r, g, b = int(h[0:2],16), int(h[2:4],16), int(h[4:6],16)
+                return f"rgba({r},{g},{b},{a})"
             fig3 = go.Figure(go.Heatmap(
                 z=pivot.values, x=[str(c) for c in pivot.columns], y=pivot.index.tolist(),
-                colorscale=[[0,bg],[0.5,alt+"88"],[1,win]],
+                colorscale=[[0,_hex2rgba(bg)],[0.5,_hex2rgba(alt,0.55)],[1,_hex2rgba(win)]],
                 hovertemplate="<b>%{y} · %{x}</b><br>%{z} articles<extra></extra>",
                 showscale=True,
                 colorbar=dict(tickfont=dict(color=muted, size=10), bgcolor=bg,
