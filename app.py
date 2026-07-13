@@ -52,6 +52,12 @@ def get_secret(name: str, default: str = "") -> str:
 # THÈMES
 # ══════════════════════════════════════════════════════════════════════════════
 THEMES = {
+    "Executive": {
+        "bg":"#0e1117","bg2":"#131823","card":"#161c28","border":"#242c3d",
+        "text":"#e9edf5","muted":"#97a1b3","accent":"#4f8cff","win":"#2dd4a7",
+        "loss":"#f0506e","alt":"#9d7bff","orange":"#f5a524","sidebar":"#10141d",
+        "btn_text":"#ffffff",
+    },
     "Obsidienne Émeraude": {
         "bg":"#0b0e13","bg2":"#0f131b","card":"#12161f","border":"#212836",
         "text":"#e6e9f0","muted":"#8a93a6","accent":"#10b981","win":"#10b981",
@@ -64,12 +70,6 @@ THEMES = {
         "loss":"#ff433d","alt":"#2797ff","orange":"#ffb300","sidebar":"#0a0a0a",
         "btn_text":"#1a1000",
     },
-    "Institutionnel Bleu": {
-        "bg":"#0a1220","bg2":"#0d1728","card":"#101b2e","border":"#1e2f4a",
-        "text":"#e8eefc","muted":"#7d8db0","accent":"#3b82f6","win":"#22c55e",
-        "loss":"#ef4444","alt":"#06b6d4","orange":"#f59e0b","sidebar":"#0b1424",
-        "btn_text":"#ffffff",
-    },
     "Graphite Pro": {
         "bg":"#101014","bg2":"#141419","card":"#17171d","border":"#27272f",
         "text":"#ececf1","muted":"#8e8e9a","accent":"#a78bfa","win":"#34d399",
@@ -78,9 +78,9 @@ THEMES = {
     },
     "Corporate Clair": {
         "light": True,
-        "bg":"#f6f7fb","bg2":"#eef0f6","card":"#ffffff","border":"#e3e6ee",
-        "text":"#111827","muted":"#64748b","accent":"#0f766e","win":"#059669",
-        "loss":"#dc2626","alt":"#6d28d9","orange":"#d97706","sidebar":"#ffffff",
+        "bg":"#f8f9fc","bg2":"#f1f3f8","card":"#ffffff","border":"#e6e9f1",
+        "text":"#141a26","muted":"#68738a","accent":"#2563eb","win":"#0f9d6e",
+        "loss":"#dc3555","alt":"#7c3aed","orange":"#d97706","sidebar":"#ffffff",
         "btn_text":"#ffffff",
     },
 }
@@ -174,7 +174,8 @@ span[data-baseweb="tag"] span {{ color:{t['accent']} !important; }}
 span[data-baseweb="tag"] svg {{ fill:{t['accent']} !important; }}
 
 /* ── Boutons ──────────────────────────────────────────────────────────── */
-.stButton > button {{ border-radius:10px; font-weight:700; transition:all .15s; }}
+.stButton > button {{ border-radius:12px; font-weight:700; transition:all .15s;
+    box-shadow:0 1px 2px rgba(0,0,0,.08); }}
 .stButton > button[kind="primary"] {{
     background:{t['accent']}; color:{t['btn_text']}; border:none; font-weight:800; }}
 .stButton > button[kind="primary"]:hover {{ filter:brightness(1.08); }}
@@ -228,13 +229,21 @@ div[data-testid="stForm"] {{
 
 /* ── Composants maison ────────────────────────────────────────────────── */
 .rfh-card {{ background:{t['card']}; border:1px solid {t['border']};
-    border-radius:14px; padding:16px 20px; }}
+    border-radius:16px; padding:16px 20px;
+    box-shadow:0 1px 3px rgba(0,0,0,.10), 0 4px 14px rgba(0,0,0,.06); }}
 .rfh-kpi {{ background:{t['card']}; border:1px solid {t['border']};
-    border-radius:14px; padding:16px 18px; min-height:100px;
-    position:relative; overflow:hidden; }}
-.rfh-kpi-bar {{ position:absolute; top:0; left:0; right:0; height:3px; }}
-.rfh-badge {{ padding:2px 10px; border-radius:20px; font-size:11px;
-    font-weight:700; letter-spacing:.5px; display:inline-block; }}
+    border-radius:16px; padding:16px; min-height:96px;
+    display:flex; gap:14px; align-items:flex-start;
+    box-shadow:0 1px 3px rgba(0,0,0,.10), 0 4px 14px rgba(0,0,0,.06);
+    transition:transform .12s, border-color .12s; }}
+.rfh-kpi:hover {{ transform:translateY(-2px); border-color:{t['accent']}66; }}
+.rfh-kpi-icon {{ width:42px; height:42px; border-radius:12px; flex-shrink:0;
+    display:flex; align-items:center; justify-content:center; font-size:17px; }}
+.rfh-kpi-bar {{ display:none; }}
+.rfh-badge {{ padding:2px 10px; border-radius:8px; font-size:11px;
+    font-weight:700; letter-spacing:.4px; display:inline-block; }}
+div[data-testid="stExpander"] details {{ border-radius:14px !important;
+    box-shadow:0 1px 3px rgba(0,0,0,.08); }}
 </style>
 """
 
@@ -1108,22 +1117,28 @@ def _kpi(icon, label, value, sub, color):
     bg, grid, muted, text, *_ = _dash_theme()
     st.markdown(
         f"<div class='rfh-kpi'>"
-        f"<div class='rfh-kpi-bar' style='background:{color}'></div>"
-        f"<div style='font-size:16px;color:{color};opacity:.9;margin-bottom:6px'>{icon}</div>"
-        f"<div style='font-size:10px;color:{muted};letter-spacing:1.5px;"
+        f"<div class='rfh-kpi-icon' style='background:{color}1c;color:{color}'>{icon}</div>"
+        f"<div style='min-width:0'>"
+        f"<div style='font-size:10px;color:{muted};letter-spacing:1.3px;"
         f"text-transform:uppercase;font-weight:600'>{label}</div>"
-        f"<div style='font-size:23px;font-weight:800;font-family:JetBrains Mono,monospace;"
-        f"color:{color};margin:4px 0'>{value}</div>"
-        f"<div style='font-size:11px;color:{muted}'>{sub}</div></div>",
+        f"<div style='font-size:22px;font-weight:800;font-family:JetBrains Mono,monospace;"
+        f"color:{text};margin:3px 0 2px;white-space:nowrap;overflow:hidden;"
+        f"text-overflow:ellipsis'>{value}</div>"
+        f"<div style='font-size:11px;color:{muted}'>{sub}</div>"
+        f"</div></div>",
         unsafe_allow_html=True)
 
 
 def _section_title(title, subtitle=""):
     _, _, muted, text, *_ = _dash_theme()
+    accent = get_theme()["accent"]
     sub_html = f" <span style='font-size:12px;color:{muted};font-weight:400'>{subtitle}</span>" if subtitle else ""
     st.markdown(
-        f"<div style='margin:6px 0 8px'><span style='font-size:15px;font-weight:700;"
-        f"color:{text}'>{title}</span>{sub_html}</div>", unsafe_allow_html=True)
+        f"<div style='margin:10px 0 10px;display:flex;align-items:center;gap:9px'>"
+        f"<span style='width:4px;height:17px;background:{accent};"
+        f"border-radius:2px;display:inline-block'></span>"
+        f"<span style='font-size:15px;font-weight:700;color:{text}'>{title}</span>"
+        f"{sub_html}</div>", unsafe_allow_html=True)
 
 
 def top_keywords(docs, n=15):
@@ -1786,7 +1801,7 @@ def calendar_page():
 
 # ── Porte d'authentification ──────────────────────────────────────────────────
 if "theme_name" not in st.session_state:
-    st.session_state.theme_name = "Corporate Clair"
+    st.session_state.theme_name = "Executive"
 
 st.markdown(build_css(get_theme()), unsafe_allow_html=True)
 
