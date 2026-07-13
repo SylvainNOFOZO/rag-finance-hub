@@ -27,7 +27,7 @@ st.set_page_config(
     page_title="RAG Finance Hub",
     page_icon="📊",
     layout="wide",
-    initial_sidebar_state="expanded",
+    initial_sidebar_state="collapsed",
 )
 
 # CSS injecté dynamiquement plus bas (dépend du thème choisi par l'utilisateur)
@@ -101,8 +101,8 @@ def build_css(t):
 /* ── Base ─────────────────────────────────────────────────────────────── */
 .stApp {{ background: {t['bg']}; font-family:'Inter',sans-serif; }}
 header[data-testid="stHeader"] {{ background: {t['bg']}; }}
-section[data-testid="stSidebar"] > div {{
-    background:{t['sidebar']}; border-right:1px solid {t['border']}; }}
+section[data-testid="stSidebar"] {{ display:none; }}
+button[data-testid="stBaseButton-headerNoPadding"] {{ display:none; }}
 .block-container {{ padding-top: 2rem; max-width: 1400px; }}
 
 /* ── Typographie ──────────────────────────────────────────────────────── */
@@ -1771,7 +1771,7 @@ def calendar_page():
 
 # ── Porte d'authentification ──────────────────────────────────────────────────
 if "theme_name" not in st.session_state:
-    st.session_state.theme_name = THEME_NAMES[0]
+    st.session_state.theme_name = "Corporate Clair"
 
 st.markdown(build_css(get_theme()), unsafe_allow_html=True)
 
@@ -1787,53 +1787,59 @@ PAGES = [
     ("scrape",    "Collecte",    ":material/travel_explore:"),
     ("library",   "Bibliothèque", ":material/local_library:"),
     ("dash",      "Dashboard",   ":material/monitoring:"),
-    ("cloud",     "Nuage de mots", ":material/cloud:"),
-    ("calendar",  "Annonces éco", ":material/event:"),
+    ("cloud",     "Nuages",       ":material/cloud:"),
+    ("calendar",  "Annonces",     ":material/event:"),
 ]
 
-with st.sidebar:
-    st.markdown("## RAG Finance Hub")
+# ── EN-TÊTE HORIZONTAL ─────────────────────────────────────────────────────────
+_th = get_theme()
+n_docs_head = count_documents()
 
+hc1, hc2, hc3, hc4 = st.columns([2.6, 1.5, 1.9, 1.1])
+with hc1:
+    st.markdown(
+        f"<div style='font-size:22px;font-weight:800;color:{_th['text']};"
+        f"padding-top:4px'>RAG Finance Hub</div>", unsafe_allow_html=True)
+with hc2:
     _sel_theme = st.selectbox(
         "Thème", THEME_NAMES,
         index=THEME_NAMES.index(st.session_state.theme_name)
               if st.session_state.theme_name in THEME_NAMES else 0,
-        key="theme_selector", label_visibility="collapsed"
-    )
+        key="theme_selector", label_visibility="collapsed")
     if _sel_theme != st.session_state.theme_name:
         st.session_state.theme_name = _sel_theme
         st.rerun()
+with hc3:
+    st.markdown(
+        f"<div style='display:flex;gap:10px;align-items:center;padding-top:6px;"
+        f"justify-content:flex-end'>"
+        f"<span style='background:{_th['accent']}18;border:1px solid {_th['accent']}44;"
+        f"border-radius:8px;padding:5px 12px;font-size:12px;color:{_th['accent']};"
+        f"font-weight:700'>📚 {n_docs_head} docs</span>"
+        f"<span style='color:{_th['muted']};font-size:12px'>"
+        f"{st.session_state.auth_user} · {st.session_state.auth_role}</span>"
+        f"</div>", unsafe_allow_html=True)
+with hc4:
+    if st.button("Déconnexion", icon=":material/logout:", use_container_width=True,
+                 key="btn_logout"):
+        logout()
 
-    st.caption(f"Connecté : **{st.session_state.auth_user}** "
-               f"({st.session_state.auth_role})")
-    st.divider()
+# ── NAVIGATION HORIZONTALE ─────────────────────────────────────────────────────
+_nav_items = list(PAGES)
+if st.session_state.auth_role == "admin":
+    _nav_items.append(("admin", "Utilisateurs", ":material/manage_accounts:"))
 
-    for key, label, icon in PAGES:
-        if st.button(f"  {label}", icon=icon, use_container_width=True,
+_nav_cols = st.columns(len(_nav_items))
+for _col, (key, label, icon) in zip(_nav_cols, _nav_items):
+    with _col:
+        if st.button(label, icon=icon, use_container_width=True,
                      type="primary" if st.session_state.nav == key else "secondary",
                      key=f"nav_{key}"):
             st.session_state.nav = key
             st.rerun()
 
-    if st.session_state.auth_role == "admin":
-        if st.button("  Utilisateurs", icon=":material/manage_accounts:",
-                     use_container_width=True,
-                     type="primary" if st.session_state.nav == "admin" else "secondary",
-                     key="nav_admin"):
-            st.session_state.nav = "admin"
-            st.rerun()
-
-    st.divider()
-    n = count_documents()
-    _th = get_theme()
-    st.markdown(
-        f"<div style='background:{_th['accent']}18;border:1px solid {_th['accent']}44;"
-        f"border-radius:8px;padding:7px 12px;font-size:12px;color:{_th['accent']}'>"
-        f"📚 {n} documents en base</div>", unsafe_allow_html=True)
-    st.markdown(" ")
-    if st.button("  Déconnexion", icon=":material/logout:",
-                 use_container_width=True):
-        logout()
+st.markdown(f"<hr style='margin:4px 0 20px;border-color:{_th['border']}'>",
+            unsafe_allow_html=True)
 
 # ── Routage ───────────────────────────────────────────────────────────────────
 nav = st.session_state.nav
