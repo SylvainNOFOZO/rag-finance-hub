@@ -77,6 +77,7 @@ THEMES = {
         "btn_text":"#17102b",
     },
     "Corporate Clair": {
+        "light": True,
         "bg":"#f6f7fb","bg2":"#eef0f6","card":"#ffffff","border":"#e3e6ee",
         "text":"#111827","muted":"#64748b","accent":"#0f766e","win":"#059669",
         "loss":"#dc2626","alt":"#6d28d9","orange":"#d97706","sidebar":"#ffffff",
@@ -84,6 +85,35 @@ THEMES = {
     },
 }
 THEME_NAMES = list(THEMES.keys())
+
+# Couleurs de domaine — deux jeux selon la luminosité du thème
+DOM_COLORS_DARK = {
+    "Finance": "#00d4aa", "Trading": "#7c6aff", "Économie": "#ff9f43",
+    "Économétrie": "#54a0ff", "Crypto": "#fdcb6e", "Matières Premières": "#ff4d6d",
+    "Géopolitique & Marchés": "#00cec9",
+}
+DOM_COLORS_LIGHT = {
+    "Finance": "#0f766e", "Trading": "#6d28d9", "Économie": "#b45309",
+    "Économétrie": "#1d4ed8", "Crypto": "#a16207", "Matières Premières": "#b91c1c",
+    "Géopolitique & Marchés": "#0e7490",
+}
+
+
+def dom_color(domain):
+    t = THEMES.get(st.session_state.get("theme_name", THEME_NAMES[0]),
+                   THEMES[THEME_NAMES[0]])
+    table = DOM_COLORS_LIGHT if t.get("light") else DOM_COLORS_DARK
+    return table.get(domain, t["muted"])
+
+
+def chart_palette():
+    t = THEMES.get(st.session_state.get("theme_name", THEME_NAMES[0]),
+                   THEMES[THEME_NAMES[0]])
+    if t.get("light"):
+        return ["#0f766e","#6d28d9","#b45309","#1d4ed8","#b91c1c",
+                "#0e7490","#a16207","#4c1d95","#be185d","#065f46"]
+    return ["#00d4aa","#7c6aff","#ff9f43","#54a0ff","#ff4d6d",
+            "#00cec9","#fdcb6e","#5f27cd","#fd79a8","#0984e3"]
 
 
 def get_theme():
@@ -362,7 +392,7 @@ def login_gate():
     st.markdown(
         "<div style='text-align:center;padding:30px 0 10px'>"
         "<h1 style='margin-bottom:4px'>RAG Finance Hub</h1>"
-        "<p style='color:#8892a4'>Intelligence financière · Trading · Économie · Économétrie</p>"
+        f"<p style='color:{get_theme()['muted']}'>Intelligence financière · Trading · Économie · Économétrie</p>"
         "</div>", unsafe_allow_html=True)
 
     _, c, _ = st.columns([1, 1.2, 1])
@@ -448,7 +478,8 @@ def admin_panel():
     me = st.session_state.auth_user
     for u in users:
         uc1, uc2, uc3, uc4, uc5 = st.columns([2, 1, 1, 1.2, 1.2])
-        status_col = "#00d4aa" if u["active"] else "#ff4d6d"
+        _ta = get_theme()
+        status_col = _ta["win"] if u["active"] else _ta["loss"]
         with uc1:
             role_badge = "👑" if u["role"] == "admin" else ""
             st.markdown(
@@ -457,7 +488,7 @@ def admin_panel():
                 f"{'● actif' if u['active'] else '● désactivé'}</span></div>",
                 unsafe_allow_html=True)
         with uc2:
-            st.markdown(f"<div style='padding-top:8px;color:#8892a4;font-size:12px'>"
+            st.markdown(f"<div style='padding-top:8px;color:{_ta['muted']};font-size:12px'>"
                         f"{u['role']}</div>", unsafe_allow_html=True)
         is_me = u["username"] == me
         with uc3:
@@ -864,9 +895,7 @@ def scraper_page():
         st.info("Aucun document. Lancez une collecte.")
     else:
         for doc in recent:
-            dom_colors = {"Finance": "#00d4aa", "Trading": "#7c6aff",
-                          "Économie": "#ff9f43", "Économétrie": "#54a0ff"}
-            dc = dom_colors.get(doc.get("domain", ""), "#8892a4")
+            dc = dom_color(doc.get("domain", ""))
             pub = str(doc.get("published", ""))[:16].replace("T", " ")
             _t2 = get_theme()
             st.markdown(
@@ -1054,14 +1083,6 @@ def chatbot_page():
 # ══════════════════════════════════════════════════════════════════════════════
 # DASHBOARD — Vue analytique professionnelle
 # ══════════════════════════════════════════════════════════════════════════════
-DOM_COLORS = {
-    "Finance": "#00d4aa", "Trading": "#7c6aff", "Économie": "#ff9f43",
-    "Économétrie": "#54a0ff", "Crypto": "#fdcb6e", "Matières Premières": "#ff4d6d",
-    "Géopolitique & Marchés": "#00cec9",
-}
-_PALETTE = ["#00d4aa","#7c6aff","#ff9f43","#54a0ff","#ff4d6d","#00cec9","#fdcb6e","#5f27cd","#fd79a8","#0984e3"]
-
-
 def _dash_theme():
     t = get_theme()
     return t["card"], t["border"], t["muted"], t["text"], t["win"], t["loss"], t["alt"], t["orange"]
@@ -1126,8 +1147,8 @@ def dashboard_page():
     f1, f2, f3 = st.columns([2.2, 1.4, 1.4])
     with f1:
         domains_sel = st.multiselect(
-            "Filtrer par domaine", list(DOM_COLORS.keys()),
-            default=list(DOM_COLORS.keys()), key="dash_domains")
+            "Filtrer par domaine", list(FEEDS.keys()),
+            default=list(FEEDS.keys()), key="dash_domains")
     with f2:
         period = st.selectbox("Période", ["7 jours", "14 jours", "30 jours", "Tout"],
                               index=2, key="dash_period")
@@ -1175,7 +1196,7 @@ def dashboard_page():
     with k3: _kpi('<i class="fa-solid fa-layer-group"></i>', "Domaines", str(df["domain"].nunique()),
                   "champs couverts", orange)
     with k4: _kpi('<i class="fa-solid fa-gauge-high"></i>', "Rythme", f"{avg_per_day:.1f}/j",
-                  "articles par jour", "#54a0ff")
+                  "articles par jour", alt)
     with k5:
         latest = df["published"].max()
         latest_txt = latest.strftime("%d/%m %H:%M") if pd.notna(latest) else "—"
@@ -1188,7 +1209,7 @@ def dashboard_page():
         f"<div style='display:flex;gap:24px;padding:10px 16px;background:{bg};"
         f"border:1px solid {grid};border-radius:10px;margin-bottom:18px;font-size:13px'>"
         f"<span style='color:{muted}'>Domaine dominant : "
-        f"<b style='color:{DOM_COLORS.get(top_domain,alt)}'>{top_domain}</b></span>"
+        f"<b style='color:{dom_color(top_domain)}'>{top_domain}</b></span>"
         f"<span style='color:{muted}'>Source la plus active : "
         f"<b style='color:{text}'>{top_source}</b></span>"
         f"</div>", unsafe_allow_html=True)
@@ -1204,7 +1225,7 @@ def dashboard_page():
             sub = by_day_dom[by_day_dom["domain"]==dom].sort_values("day")
             fig1.add_trace(go.Bar(
                 x=sub["day"].astype(str), y=sub["n"], name=dom,
-                marker_color=DOM_COLORS.get(dom, "#8892a4"), marker_opacity=0.85,
+                marker_color=dom_color(dom), marker_opacity=0.85,
                 hovertemplate=f"<b>{dom}</b><br>%{{x}}: %{{y}} articles<extra></extra>"))
         fig1.update_layout(**_layout(height=300, showlegend=True, barmode="stack"),
                            legend=dict(orientation="h", y=-0.18, font=dict(color=muted, size=10)))
@@ -1215,7 +1236,7 @@ def dashboard_page():
         by_dom = df["domain"].value_counts()
         fig2 = go.Figure(go.Pie(
             values=by_dom.values.tolist(), labels=by_dom.index.tolist(), hole=0.62,
-            marker=dict(colors=[DOM_COLORS.get(d, "#8892a4") for d in by_dom.index],
+            marker=dict(colors=[dom_color(d) for d in by_dom.index],
                         line=dict(color=bg, width=3)),
             hovertemplate="<b>%{label}</b>: %{value} (%{percent})<extra></extra>", textinfo="none"))
         fig2.add_annotation(text=f"<b>{len(df)}</b>", x=0.5, y=0.56,
@@ -1256,7 +1277,7 @@ def dashboard_page():
         by_src = df["source"].value_counts().head(8).sort_values()
         fig4 = go.Figure(go.Bar(
             y=by_src.index.tolist(), x=by_src.values.tolist(), orientation="h",
-            marker_color=_PALETTE[:len(by_src)], marker_opacity=0.85,
+            marker_color=chart_palette()[:len(by_src)], marker_opacity=0.85,
             text=by_src.values.tolist(), textposition="outside",
             textfont=dict(color=muted, size=11),
             hovertemplate="<b>%{y}</b>: %{x} articles<extra></extra>"))
@@ -1364,7 +1385,7 @@ def dashboard_page():
 
     show = df.sort_values("published", ascending=False).head(20)
     for _, r in show.iterrows():
-        dc = DOM_COLORS.get(r["domain"], "#8892a4")
+        dc = dom_color(r["domain"])
         pub = r["published"].strftime("%d/%m %H:%M") if pd.notna(r["published"]) else ""
         st.markdown(
             f"<div style='background:{bg};border:1px solid {grid};"
@@ -1469,7 +1490,7 @@ def library_page():
 
     # ── CARTES ARTICLES ──────────────────────────────────────────────────────
     for i, r in page_df.iterrows():
-        dc = DOM_COLORS.get(r["domain"], muted)
+        dc = dom_color(r["domain"])
         pub = r["published"].strftime("%d/%m/%Y %H:%M") if pd.notna(r["published"]) else "—"
         lang_badge = r.get("lang", "?") or "?"
         summary = (r.get("content") or "")
@@ -1547,16 +1568,19 @@ def build_wordcloud(theme: str, domains=None, max_words: int = 80):
     if not tokens:
         return None, len(ctx)
 
+    _tw = get_theme()
+    _wc_bg = "#ffffff" if _tw.get("light") else _tw["card"]
+    _wc_cmap = "Dark2" if _tw.get("light") else "viridis"
     wc = WordCloud(
         width=1100, height=500,
-        background_color="#0a0c12",
-        colormap="viridis",
+        background_color=_wc_bg,
+        colormap=_wc_cmap,
         max_words=max_words,
         prefer_horizontal=0.9,
         min_font_size=10,
     ).generate(" ".join(tokens))
 
-    fig, ax = plt.subplots(figsize=(11, 5), facecolor="#0a0c12")
+    fig, ax = plt.subplots(figsize=(11, 5), facecolor=_wc_bg)
     ax.imshow(wc, interpolation="bilinear")
     ax.axis("off")
     fig.tight_layout(pad=0)
@@ -1592,9 +1616,10 @@ def wordcloud_page():
             st.warning(f"Aucun document trouvé sur « {theme} ». "
                        "Lancez une collecte ou essayez un autre thème.")
         else:
+            _twc = get_theme()
             st.markdown(
-                f"<div style='color:#6b7894;font-size:13px;margin-bottom:8px'>"
-                f"Basé sur <b style='color:#00d4aa'>{n_docs}</b> documents "
+                f"<div style='color:{_twc['muted']};font-size:13px;margin-bottom:8px'>"
+                f"Basé sur <b style='color:{_twc['accent']}'>{n_docs}</b> documents "
                 f"pertinents</div>", unsafe_allow_html=True)
             st.pyplot(fig, use_container_width=True)
             plt.close(fig)
@@ -1627,12 +1652,15 @@ ASSET_CURRENCIES = {
     "SILVER (XAG/USD)": ["USD"],
 }
 
-IMPACT_STYLE = {
-    "High":   ("#ff4d6d", "Fort"),
-    "Medium": ("#ff9f43", "Moyen"),
-    "Low":    ("#54a0ff", "Faible"),
-    "Holiday": ("#6b7894", "Férié"),
-}
+def impact_style(impact):
+    t = get_theme()
+    table = {
+        "High":    (t["loss"],   "Fort"),
+        "Medium":  (t["orange"], "Moyen"),
+        "Low":     (t["alt"],    "Faible"),
+        "Holiday": (t["muted"],  "Férié"),
+    }
+    return table.get(impact, (t["muted"], "?"))
 
 
 @st.cache_data(ttl=1800, show_spinner=False)
@@ -1663,7 +1691,7 @@ def calendar_page():
         "Niveau d'impact",
         ["High", "Medium", "Low"],
         default=["High", "Medium"],
-        format_func=lambda x: IMPACT_STYLE[x][1],
+        format_func=lambda x: impact_style(x)[1],
         key="cal_impacts")
 
     events = fetch_calendar()
@@ -1695,32 +1723,19 @@ def calendar_page():
 
     # KPIs rapides
     n_high = len(df[df["impact"] == "High"])
+    _tc = get_theme()
+    def _cal_kpi(label, value, color):
+        st.markdown(
+            f"<div style='background:{_tc['card']};border:1px solid {_tc['border']};"
+            f"border-radius:12px;padding:14px 18px'>"
+            f"<span style='color:{_tc['muted']};font-size:11px;text-transform:uppercase'>"
+            f"{label}</span><br>"
+            f"<b style='font-size:22px;color:{color};font-family:monospace'>"
+            f"{value}</b></div>", unsafe_allow_html=True)
     k1, k2, k3 = st.columns(3)
-    with k1:
-        st.markdown(
-            f"<div style='background:#111520;border:1px solid #1e2535;"
-            f"border-radius:12px;padding:14px 18px'>"
-            f"<span style='color:#6b7894;font-size:11px;text-transform:uppercase'>"
-            f"Annonces filtrées</span><br>"
-            f"<b style='font-size:22px;color:#00d4aa;font-family:monospace'>"
-            f"{len(df)}</b></div>", unsafe_allow_html=True)
-    with k2:
-        st.markdown(
-            f"<div style='background:#111520;border:1px solid #1e2535;"
-            f"border-radius:12px;padding:14px 18px'>"
-            f"<span style='color:#6b7894;font-size:11px;text-transform:uppercase'>"
-            f"Impact fort</span><br>"
-            f"<b style='font-size:22px;color:#ff4d6d;font-family:monospace'>"
-            f"{n_high}</b></div>", unsafe_allow_html=True)
-    with k3:
-        st.markdown(
-            f"<div style='background:#111520;border:1px solid #1e2535;"
-            f"border-radius:12px;padding:14px 18px'>"
-            f"<span style='color:#6b7894;font-size:11px;text-transform:uppercase'>"
-            f"Devises suivies</span><br>"
-            f"<b style='font-size:22px;color:#7c6aff;font-family:monospace'>"
-            f"{', '.join(sorted(currencies)) or '—'}</b></div>",
-            unsafe_allow_html=True)
+    with k1: _cal_kpi("Annonces filtrées", str(len(df)), _tc["accent"])
+    with k2: _cal_kpi("Impact fort", str(n_high), _tc["loss"])
+    with k3: _cal_kpi("Devises suivies", ", ".join(sorted(currencies)) or "—", _tc["alt"])
     st.markdown(" ")
 
     # Liste des événements groupés par jour
@@ -1736,7 +1751,7 @@ def calendar_page():
             day_fr = day_fr.replace(en, fr)
         st.markdown(f"##### {day_fr}")
         for _, ev in grp.iterrows():
-            color, impact_fr = IMPACT_STYLE.get(ev.get("impact", ""), ("#6b7894", "?"))
+            color, impact_fr = impact_style(ev.get("impact", ""))
             t = ev["date_parsed"]
             heure = t.strftime("%H:%M") if pd.notna(t) else "--:--"
             past = pd.notna(t) and t < now
@@ -1744,20 +1759,20 @@ def calendar_page():
             forecast = ev.get("forecast", "") or "—"
             previous = ev.get("previous", "") or "—"
             st.markdown(
-                f"<div style='background:#111520;border:1px solid #1e2535;"
+                f"<div style='background:{_tc['card']};border:1px solid {_tc['border']};"
                 f"border-left:3px solid {color};border-radius:10px;"
                 f"padding:10px 16px;margin-bottom:6px;opacity:{opacity};"
                 f"display:flex;gap:18px;align-items:center;flex-wrap:wrap'>"
-                f"<span style='color:#8892a4;font-family:monospace;min-width:48px'>"
+                f"<span style='color:{_tc['muted']};font-family:monospace;min-width:48px'>"
                 f"{heure}</span>"
                 f"<span style='background:{color}22;color:{color};padding:2px 10px;"
                 f"border-radius:12px;font-size:11px;font-weight:700'>"
                 f"{ev.get('country','')}</span>"
-                f"<span style='color:#e8ecf4;font-weight:600;flex:1'>"
+                f"<span style='color:{_tc['text']};font-weight:600;flex:1'>"
                 f"{ev.get('title','')}</span>"
                 f"<span style='color:{color};font-size:11px;font-weight:700'>"
                 f"{impact_fr}</span>"
-                f"<span style='color:#6b7894;font-size:11px'>"
+                f"<span style='color:{_tc['muted']};font-size:11px'>"
                 f"Prév : {forecast} · Préc : {previous}</span>"
                 f"</div>", unsafe_allow_html=True)
 
