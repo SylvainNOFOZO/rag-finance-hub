@@ -1179,8 +1179,18 @@ def dashboard_page():
 
     df = pd.DataFrame(docs)
     df["published"] = pd.to_datetime(df["published"], errors="coerce", utc=True)
+
+    # Les documents sans date de publication exploitable ne peuvent être placés
+    # sur aucun axe temporel : on les écarte des analyses (et on le signale).
+    _n_invalid = int(df["published"].isna().sum())
+    df = df[df["published"].notna()].copy()
+    if df.empty:
+        st.warning("Aucun document avec une date de publication valide. "
+                   "Relancez une collecte.")
+        return
+
     df["day"] = df["published"].dt.date
-    df["hour"] = df["published"].dt.hour
+    df["hour"] = df["published"].dt.hour.astype(int)
     df["weekday"] = df["published"].dt.day_name()
 
     if period != "Tout":
@@ -1197,9 +1207,14 @@ def dashboard_page():
         st.info("Aucun document ne correspond à ces filtres.")
         return
 
+    if _n_invalid:
+        st.caption(f"{_n_invalid} document(s) sans date de publication valide "
+                   f"écarté(s) des analyses temporelles.")
+
     # ── KPIs ────────────────────────────────────────────────────────────────
     k1, k2, k3, k4, k5 = st.columns(5)
-    n_days_span = max((df["day"].max() - df["day"].min()).days, 1) if len(df) > 1 else 1
+    _dmin, _dmax = df["day"].min(), df["day"].max()
+    n_days_span = max((_dmax - _dmin).days, 1) if len(df) > 1 else 1
     avg_per_day = len(df) / n_days_span
     top_domain = df["domain"].value_counts().idxmax() if not df.empty else "—"
     top_source = df["source"].value_counts().idxmax() if not df.empty else "—"
@@ -1321,7 +1336,7 @@ def dashboard_page():
     with r6:
         by_hour = df.groupby("hour").size().reindex(range(24), fill_value=0)
         fig6 = go.Figure(go.Bar(
-            x=[f"{h:02d}h" for h in by_hour.index], y=by_hour.values,
+            x=[f"{int(h):02d}h" for h in by_hour.index], y=by_hour.values,
             marker_color=orange, marker_opacity=0.8,
             hovertemplate="<b>%{x}</b>: %{y} articles<extra></extra>"))
         fig6.update_layout(**_layout(height=max(260, len(kw_df)*30) if kws else 300))
