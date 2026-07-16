@@ -779,6 +779,19 @@ def load_documents(domains: list = None, limit: int = 800, langs: list = None,
         return []
 
 
+def list_domains():
+    """Liste distincte des domaines présents en base."""
+    ep, hdr = _sb_docs()
+    try:
+        r = requests.get(ep, headers=hdr, timeout=10,
+                         params=[("select", "domain"), ("limit", "3000")])
+        if r.status_code == 200:
+            return sorted({row.get("domain","") for row in r.json() if row.get("domain")})
+    except Exception:
+        pass
+    return []
+
+
 def list_sources():
     """Liste distincte des sources présentes en base."""
     ep, hdr = _sb_docs()
@@ -1161,9 +1174,11 @@ def dashboard_page():
     st.markdown(f"<div class='rfh-card' style='margin-bottom:18px'>", unsafe_allow_html=True)
     f1, f2, f3 = st.columns([2.2, 1.4, 1.4])
     with f1:
+        _db_domains = list_domains()
+        _dom_options = sorted(set(_db_domains) | set(FEEDS.keys()))
         domains_sel = st.multiselect(
-            "Filtrer par domaine", list(FEEDS.keys()),
-            default=list(FEEDS.keys()), key="dash_domains")
+            "Filtrer par domaine", _dom_options,
+            default=_dom_options, key="dash_domains")
     with f2:
         period = st.selectbox("Période", ["7 jours", "14 jours", "30 jours", "Tout"],
                               index=2, key="dash_period")
@@ -1172,9 +1187,17 @@ def dashboard_page():
                                   key="dash_search")
     st.markdown("</div>", unsafe_allow_html=True)
 
-    docs = load_documents(domains=domains_sel or None, limit=1500)
+    if not domains_sel:
+        st.info("Sélectionnez au moins un domaine pour afficher les analyses.")
+        return
+
+    # Si tous les domaines connus sont cochés, on n'envoie aucun filtre :
+    # cela inclut d'éventuels domaines présents en base mais absents des options.
+    _all_selected = set(domains_sel) == set(_dom_options)
+    docs = load_documents(domains=None if _all_selected else domains_sel, limit=1500)
     if not docs:
-        st.warning("Aucun document. Lancez d'abord une collecte (page **Collecte**).")
+        st.warning("Aucun document pour cette sélection. "
+                   "Lancez une collecte (page **Collecte**) ou élargissez les filtres.")
         return
 
     df = pd.DataFrame(docs)
@@ -1442,7 +1465,8 @@ def library_page():
     with st.container():
         lf1, lf2, lf3 = st.columns([2, 1, 1])
         with lf1:
-            lib_domains = st.multiselect("Domaines", list(FEEDS.keys()),
+            _lib_dom_opts = sorted(set(list_domains()) | set(FEEDS.keys()))
+            lib_domains = st.multiselect("Domaines", _lib_dom_opts,
                                          default=[], key="lib_domains",
                                          placeholder="Tous les domaines")
         with lf2:
